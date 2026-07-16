@@ -44,7 +44,7 @@ fun RemoteImage(
 ) {
     if (LocalInspectionMode.current) {
         Image(
-            modifier = modifier,
+            modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant),
             painter = painterResource(id = R.drawable.ic_launcher_foreground),
             contentDescription = contentDescription,
             contentScale = contentScale,
