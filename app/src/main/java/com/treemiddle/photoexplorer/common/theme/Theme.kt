@@ -1,6 +1,5 @@
-package com.treemiddle.photoexplorer.ui.theme
+package com.treemiddle.photoexplorer.common.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

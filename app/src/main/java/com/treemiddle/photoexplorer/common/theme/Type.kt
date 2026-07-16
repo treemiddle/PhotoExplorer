@@ -1,4 +1,4 @@
-package com.treemiddle.photoexplorer.ui.theme
+package com.treemiddle.photoexplorer.common.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
