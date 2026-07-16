@@ -31,7 +31,7 @@ import com.treemiddle.photoexplorer.R
 
 @Composable
 fun RemoteImage(
-    model: String?,
+    model: Any?,
     contentDescription: String?,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
@@ -113,7 +113,7 @@ private fun BoxScope.DefaultImageError(modifier: Modifier = Modifier) {
 }
 
 @Composable
-@Preview
+@Preview(name = "리모트 이미지")
 private fun P1() {
     RemoteImage(
         model = "",
