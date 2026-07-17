@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.treemiddle.photoexplorer.R
+import com.treemiddle.photoexplorer.common.designsystem.FullScreenError
 import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
 import com.treemiddle.photoexplorer.common.designsystem.PhotoCard
 import com.treemiddle.photoexplorer.common.designsystem.TopBar
@@ -58,14 +59,20 @@ private fun Screen(
     }
     Content(
         isLoading = state.isLoading,
-        photoList = state.photoList
+        isError = state.isError,
+        photoList = state.photoList,
+        onRetryClick = {
+            onEventSent(PhotoListContract.Event.OnRetryClick)
+        }
     )
 }
 
 @Composable
 private fun Content(
     isLoading: Boolean,
-    photoList: List<PhotoInfo>
+    isError: Boolean,
+    photoList: List<PhotoInfo>,
+    onRetryClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -91,6 +98,13 @@ private fun Content(
             when {
                 isLoading -> {
                     FullScreenLoading()
+                }
+
+                isError -> {
+                    FullScreenError(
+                        message = stringResource(id = R.string.full_screen_error_text),
+                        onRetryButtonClick = onRetryClick
+                    )
                 }
 
                 else -> {
@@ -138,13 +152,15 @@ private fun List(
 
 @Preview(
     showBackground = true,
-    name = "로딩"
+    name = "로딩화면"
 )
 @Composable
 private fun P1() {
     Content(
         isLoading = true,
-        photoList = emptyList()
+        isError = false,
+        photoList = emptyList(),
+        onRetryClick = {}
     )
 }
 
@@ -156,6 +172,7 @@ private fun P1() {
 private fun P2() {
     Content(
         isLoading = false,
+        isError = false,
         photoList = listOf(
             PhotoInfo(
                 id = "1",
@@ -171,6 +188,21 @@ private fun P2() {
                 authorName = "작가 이름 작가 이름",
                 authorProfileImageUrl = ""
             ),
-        )
+        ),
+        onRetryClick = {}
+    )
+}
+
+@Preview(
+    showBackground = true,
+    name = "에러화면"
+)
+@Composable
+private fun P3() {
+    Content(
+        isLoading = false,
+        isError = true,
+        photoList = emptyList(),
+        onRetryClick = {}
     )
 }

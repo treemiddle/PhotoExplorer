@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.treemiddle.photoexplorer.base.BaseViewModelV4
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,7 +17,9 @@ class PhotoListViewModel @Inject constructor(
 
     override fun handleEvents(event: PhotoListContract.Event) {
         when (event) {
-            else -> {}
+            PhotoListContract.Event.OnRetryClick -> {
+                getPhotoList()
+            }
         }
     }
 
@@ -28,7 +29,10 @@ class PhotoListViewModel @Inject constructor(
 
     private fun getPhotoList() {
         setState {
-            copy(isLoading = true)
+            copy(
+                isLoading = true,
+                isError = false
+            )
         }
         viewModelScope.launch {
             runCatching {
@@ -37,12 +41,16 @@ class PhotoListViewModel @Inject constructor(
                 setState {
                     copy(
                         isLoading = false,
+                        isError = false,
                         photoList = it.list
                     )
                 }
             }.onFailure {
                 setState {
-                    copy(isLoading = false)
+                    copy(
+                        isLoading = false,
+                        isError = true
+                    )
                 }
             }
         }
