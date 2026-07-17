@@ -6,7 +6,7 @@ import com.treemiddle.photoexplorer.base.ViewState
 
 sealed interface PhotoDetailContract {
     data class State(
-        val noValue: Unit = Unit
+        val isLiked: Boolean = false
     ) : ViewState
 
     sealed interface Event : ViewEvent
