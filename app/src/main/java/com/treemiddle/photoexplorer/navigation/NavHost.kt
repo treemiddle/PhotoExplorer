@@ -36,7 +36,11 @@ fun NavHost(controller: NavHostController = rememberNavController()) {
             PhotoDetailScreen()
         }
         composable(route = Route.LIKED_PHOTO_LIST) {
-            LikedPhotoListScreen()
+            LikedPhotoListScreen(
+                onNavigateBack = {
+                    controller.popBackStack()
+                }
+            )
         }
     }
 }
