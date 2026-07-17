@@ -107,6 +107,10 @@ private fun Content(
                     )
                 }
 
+                photoList.isEmpty() -> {
+                    FullScreenError(message = stringResource(id = R.string.full_screen_photo_list_empty_text))
+                }
+
                 else -> {
                     List(list = photoList)
                 }
@@ -202,6 +206,20 @@ private fun P3() {
     Content(
         isLoading = false,
         isError = true,
+        photoList = emptyList(),
+        onRetryClick = {}
+    )
+}
+
+@Preview(
+    showBackground = true,
+    name = "사진 리스트가 없는 화면"
+)
+@Composable
+private fun P4() {
+    Content(
+        isLoading = false,
+        isError = false,
         photoList = emptyList(),
         onRetryClick = {}
     )
