@@ -21,6 +21,8 @@ class LikeRepositoryImpl @Inject constructor(
 
     private val likeIdHashMap = ConcurrentHashMap<String, Mutex>()
 
+    override fun observeIsLiked(id: String): Flow<Boolean> = localDataSource.observeIsLiked(id = id)
+
     override suspend fun updatePhoto(photo: LikedPhotoRequest) {
         val mutex = likeIdHashMap.getOrPut(
             key = photo.id,

@@ -79,7 +79,7 @@ private fun Screen(
         localPhoto = state.localPhoto,
         onBackClick = onNavigateBack,
         onLikeClick = {
-
+            onEventSent(PhotoDetailContract.Event.OnPhotoLikeClick)
         },
         onRetryClick = {
             onEventSent(PhotoDetailContract.Event.OnRetryClick)
@@ -106,8 +106,7 @@ private fun Content(
                 actions = {
                     LikeButton(
                         isLiked = isLiked,
-                        onClick = onLikeClick,
-                        withScrim = false
+                        onClick = onLikeClick
                     )
                 }
             )

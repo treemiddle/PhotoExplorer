@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 interface PhotoLocalDataSource {
     val likedIds: Flow<Set<String>>
 
+    fun observeIsLiked(id: String): Flow<Boolean>
+
     suspend fun addPhotoCard(photoCard: LikedPhotoData)
     suspend fun hasId(id: String): Boolean
     suspend fun saveImage(

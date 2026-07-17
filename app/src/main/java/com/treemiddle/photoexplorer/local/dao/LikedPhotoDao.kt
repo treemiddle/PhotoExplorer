@@ -26,4 +26,7 @@ interface LikedPhotoDao {
 
     @Query("SELECT * FROM liked_photo_card WHERE id = :id")
     suspend fun get(id: String): LikedPhotoCardEntity?
+
+    @Query("SELECT EXISTS(SELECT 1 FROM liked_photo_card WHERE id = :id)")
+    fun observeIsLiked(id: String): Flow<Boolean>
 }

@@ -3,6 +3,7 @@ package com.treemiddle.photoexplorer.feature.photodetail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.treemiddle.photoexplorer.base.BaseViewModelV4
+import com.treemiddle.photoexplorer.core.exception.StorageException
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
 import com.treemiddle.photoexplorer.feature.photolist.model.UserMessage
@@ -20,6 +21,9 @@ class PhotoDetailViewModel @Inject constructor(
 ) : BaseViewModelV4<PhotoDetailContract.Event, PhotoDetailContract.State, PhotoDetailContract.Effect>() {
     private val photoId = savedStateHandle[Route.PHOTO_ID] ?: ""
 
+    private var likeProcessing = false
+    private var isLikedInDatabase = false
+
     override fun setInitialState(): PhotoDetailContract.State {
         return PhotoDetailContract.State()
     }
@@ -29,11 +33,16 @@ class PhotoDetailViewModel @Inject constructor(
             is PhotoDetailContract.Event.OnRetryClick -> {
                 getPhotoDetail()
             }
+
+            is PhotoDetailContract.Event.OnPhotoLikeClick -> {
+                onPhotoLikeClick()
+            }
         }
     }
 
     init {
         getPhotoDetail()
+        observeIsLiked()
     }
 
     private fun getPhotoDetail() {
@@ -86,6 +95,50 @@ class PhotoDetailViewModel @Inject constructor(
                 }
                 setEffect {
                     PhotoDetailContract.Effect.ShowMessage(message = UserMessage.DETAIL_INFO_ERROR)
+                }
+                isLikedInDatabase = true
+            }
+        }
+    }
+
+    private fun onPhotoLikeClick() {
+        val request = viewState.value.request ?: return
+        if (likeProcessing) {
+            return
+        }
+
+        likeProcessing = true
+        setState {
+            copy(isLiked = isLiked.not())
+        }
+        viewModelScope.launch {
+            runCatching {
+                likedRepository.updatePhoto(photo = request)
+            }.onFailure {
+                setState {
+                    copy(isLiked = isLikedInDatabase)
+                }
+                val message = if (it is StorageException) {
+                    UserMessage.STORAGE_FULL
+                } else {
+                    UserMessage.LIKE_FAILED
+                }
+                setEffect {
+                    PhotoDetailContract.Effect.ShowMessage(message = message)
+                }
+            }
+            likeProcessing = false
+        }
+    }
+
+    private fun observeIsLiked() {
+        viewModelScope.launch {
+            likedRepository.observeIsLiked(id = photoId).collect { isLiked ->
+                isLikedInDatabase = isLiked
+                if (likeProcessing.not()) {
+                    setState {
+                        copy(isLiked = isLiked)
+                    }
                 }
             }
         }

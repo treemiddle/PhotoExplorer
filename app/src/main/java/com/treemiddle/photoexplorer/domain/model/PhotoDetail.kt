@@ -81,3 +81,15 @@ data class Location(
         ""
     }
 }
+
+fun PhotoDetail.toLikedPhotoRequest(): LikedPhotoRequest {
+    return LikedPhotoRequest(
+        id = id,
+        description = description,
+        authorName = authorName,
+        authorProfileImageUrl = authorProfileImageUrl,
+        imageUrl = regularUrl,
+        width = width,
+        height = height
+    )
+}

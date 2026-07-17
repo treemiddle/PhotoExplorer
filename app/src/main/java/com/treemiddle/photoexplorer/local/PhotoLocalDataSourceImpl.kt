@@ -17,6 +17,8 @@ class PhotoLocalDataSourceImpl @Inject constructor(
         it.toSet()
     }
 
+    override fun observeIsLiked(id: String): Flow<Boolean> = likedPhotoDao.observeIsLiked(id = id)
+
     override suspend fun addPhotoCard(photoCard: LikedPhotoData) {
         likedPhotoDao.add(photoCard.toLocal())
     }

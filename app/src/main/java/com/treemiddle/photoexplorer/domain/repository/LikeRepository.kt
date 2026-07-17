@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.Flow
 interface LikeRepository {
     val likedIds: Flow<Set<String>>
 
+    fun observeIsLiked(id: String): Flow<Boolean>
+
     suspend fun updatePhoto(photo: LikedPhotoRequest)
     suspend fun getLikedPhotoList(
         limit: Int,
