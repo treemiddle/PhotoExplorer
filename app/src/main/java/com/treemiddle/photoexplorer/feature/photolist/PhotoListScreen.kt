@@ -1,16 +1,9 @@
 package com.treemiddle.photoexplorer.feature.photolist
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
@@ -23,18 +16,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.treemiddle.photoexplorer.R
-import com.treemiddle.photoexplorer.common.designsystem.FooterLoading
 import com.treemiddle.photoexplorer.common.designsystem.FullScreenError
 import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
 import com.treemiddle.photoexplorer.common.designsystem.PhotoCard
 import com.treemiddle.photoexplorer.common.designsystem.TopBar
-import com.treemiddle.photoexplorer.core.extension.LoadMoreEffect
 import com.treemiddle.photoexplorer.core.extension.rememberSingleClick
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
+import com.treemiddle.photoexplorer.feature.common.PhotoList
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -176,52 +167,32 @@ private fun List(
     onPhotoLikeClick: (String) -> Unit,
     isLoadingMore: Boolean = false,
     isLoadingMoreError: Boolean = false,
-    onRetryLoadMore: () -> Unit = {},
+    onRetryLoadMore: () -> Unit = {}
 ) {
-    val lazyGirdState = rememberLazyGridState()
-
-    lazyGirdState.LoadMoreEffect(
-        itemCount = list.size,
-        onLoadMore = onLoadMore
-    )
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(count = 2),
+    PhotoList(
+        list = list,
+        key = {
+            it.id
+        },
+        onLoadMore = onLoadMore,
         modifier = modifier,
-        state = lazyGirdState,
-        contentPadding = PaddingValues(all = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(space = 10.dp),
-        horizontalArrangement = Arrangement.spacedBy(space = 10.dp)
+        isLoadingMore = isLoadingMore,
+        isLoadingMoreError = isLoadingMoreError,
+        onRetryLoadMore = onRetryLoadMore
     ) {
-        items(
-            items = list,
-            key = {
-                it.id
+        PhotoCard(
+            image = it.thumbUrl,
+            description = it.description,
+            authorName = it.authorName,
+            authorProfileImageUrl = it.authorProfileImageUrl,
+            isLiked = it.isLiked,
+            onClick = {
+                onPhotoClick(it.id)
+            },
+            onLikeClick = {
+                onPhotoLikeClick(it.id)
             }
-        ) {
-            PhotoCard(
-                image = it.thumbUrl,
-                description = it.description,
-                authorName = it.authorName,
-                authorProfileImageUrl = it.authorProfileImageUrl,
-                isLiked = it.isLiked,
-                onClick = {
-                    onPhotoClick(it.id)
-                },
-                onLikeClick = {
-                    onPhotoLikeClick(it.id)
-                }
-            )
-        }
-        if (isLoadingMore || isLoadingMoreError) {
-            item(span = { GridItemSpan(currentLineSpan = maxLineSpan) }) {
-                FooterLoading(
-                    isLoading = isLoadingMore,
-                    isError = isLoadingMoreError,
-                    onRetry = onRetryLoadMore
-                )
-            }
-        }
+        )
     }
 }
 

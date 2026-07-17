@@ -3,6 +3,8 @@ package com.treemiddle.photoexplorer.data.repository
 import com.treemiddle.photoexplorer.data.datasource.PhotoExplorerRemoteDataSource
 import com.treemiddle.photoexplorer.data.datasource.PhotoLocalDataSource
 import com.treemiddle.photoexplorer.data.mapper.toData
+import com.treemiddle.photoexplorer.data.mapper.toDomain
+import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
 import com.treemiddle.photoexplorer.domain.model.toLikedPhotoRequest
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
@@ -34,6 +36,10 @@ class LikeRepositoryImpl @Inject constructor(
                 like(photoInfo = photoInfo)
             }
         }
+    }
+
+    override suspend fun getLikedPhotoList(offset: Int): List<LikedPhotoCard> {
+        return localDataSource.getLikedPhotoList(offset = offset).toDomain()
     }
 
     private suspend fun like(photoInfo: PhotoInfo) {

@@ -3,6 +3,7 @@ package com.treemiddle.photoexplorer.local
 import com.treemiddle.photoexplorer.data.datasource.PhotoLocalDataSource
 import com.treemiddle.photoexplorer.data.model.LikedPhotoData
 import com.treemiddle.photoexplorer.local.dao.LikedPhotoDao
+import com.treemiddle.photoexplorer.local.mapper.toData
 import com.treemiddle.photoexplorer.local.mapper.toLocal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -37,5 +38,16 @@ class PhotoLocalDataSourceImpl @Inject constructor(
     override suspend fun deleteImage(id: String) {
         likedPhotoDao.delete(id = id)
         localImageStore.delete(id = id)
+    }
+
+    override suspend fun getLikedPhotoList(offset: Int): List<LikedPhotoData> {
+        return likedPhotoDao.getPage(
+            limit = PAGE_SIZE,
+            offset = offset
+        ).toData()
+    }
+
+    companion object {
+        private const val PAGE_SIZE = 20
     }
 }

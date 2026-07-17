@@ -4,15 +4,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.treemiddle.photoexplorer.R
+import com.treemiddle.photoexplorer.common.designsystem.FullScreenError
+import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
+import com.treemiddle.photoexplorer.common.designsystem.PhotoCard
 import com.treemiddle.photoexplorer.common.designsystem.TopBar
+import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
+import com.treemiddle.photoexplorer.domain.model.PhotoInfo
+import com.treemiddle.photoexplorer.feature.common.PhotoList
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 @Composable
 fun LikedPhotoListScreen(
@@ -35,12 +41,16 @@ private fun Screen(
     onNavigateBack: () -> Unit,
 ) {
    Content(
+       isLoading = state.isLoading,
+       photoList = state.photoList,
        onBackButtonClick = onNavigateBack
    )
 }
 
 @Composable
 private fun Content(
+    isLoading: Boolean,
+    photoList: List<LikedPhotoCard>,
     onBackButtonClick: () -> Unit
 ) {
     Scaffold(
@@ -56,7 +66,55 @@ private fun Content(
                 .fillMaxSize()
                 .padding(paddingValues = innerPadding)
         ) {
-            Text(text = "좋아요한 사진 리스트 화면")
+            when {
+                isLoading -> {
+                    FullScreenLoading()
+                }
+
+                photoList.isEmpty() -> {
+                    FullScreenError(message = stringResource(id = R.string.liked_photo_list_empty_text))
+                }
+
+                else -> {
+                    List(
+                        list = photoList
+                    )
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun List(
+    list: List<LikedPhotoCard>,
+    modifier: Modifier = Modifier,
+    isLoadingMore: Boolean = false
+) {
+    PhotoList(
+        list = list,
+        key = {
+            it.id
+        },
+        onLoadMore = {
+
+        },
+        modifier = modifier,
+        isLoadingMore = isLoadingMore,
+        isLoadingMoreError = false
+    ) {
+        PhotoCard(
+            image = File(it.localImagePath),
+            description = it.description,
+            authorName = it.authorName,
+            authorProfileImageUrl = it.authorProfileImageUrl,
+            isLiked = it.isLiked,
+            onClick = {
+
+            },
+            onLikeClick = {
+
+            }
+        )
     }
 }
