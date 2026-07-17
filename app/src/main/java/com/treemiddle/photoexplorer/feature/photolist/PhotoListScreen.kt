@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
@@ -16,14 +15,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.treemiddle.photoexplorer.R
+import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
 import com.treemiddle.photoexplorer.common.designsystem.PhotoCard
 import com.treemiddle.photoexplorer.common.designsystem.TopBar
 import com.treemiddle.photoexplorer.core.extension.rememberSingleClick
@@ -56,11 +56,15 @@ private fun Screen(
             }
         }
     }
-    Content(photoList = state.photoList)
+    Content(
+        isLoading = state.isLoading,
+        photoList = state.photoList
+    )
 }
 
 @Composable
 private fun Content(
+    isLoading: Boolean,
     photoList: List<PhotoInfo>
 ) {
     Scaffold(
@@ -84,7 +88,15 @@ private fun Content(
                 .fillMaxSize()
                 .padding(paddingValues = innerPadding)
         ) {
-            List(list = photoList)
+            when {
+                isLoading -> {
+                    FullScreenLoading()
+                }
+
+                else -> {
+                    List(list = photoList)
+                }
+            }
         }
     }
 }
@@ -122,4 +134,43 @@ private fun List(
             )
         }
     }
+}
+
+@Preview(
+    showBackground = true,
+    name = "로딩"
+)
+@Composable
+private fun P1() {
+    Content(
+        isLoading = true,
+        photoList = emptyList()
+    )
+}
+
+@Preview(
+    showBackground = true,
+    name = "사진 목록"
+)
+@Composable
+private fun P2() {
+    Content(
+        isLoading = false,
+        photoList = listOf(
+            PhotoInfo(
+                id = "1",
+                thumbUrl = "",
+                description = "설명",
+                authorName = "작가 이름",
+                authorProfileImageUrl = ""
+            ),
+            PhotoInfo(
+                id = "2",
+                thumbUrl = "",
+                description = "설명",
+                authorName = "작가 이름 작가 이름",
+                authorProfileImageUrl = ""
+            ),
+        )
+    )
 }

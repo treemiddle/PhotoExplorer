@@ -6,7 +6,10 @@ import com.treemiddle.photoexplorer.base.ViewState
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
 
 sealed interface PhotoListContract {
-    data class State(val photoList: List<PhotoInfo> = emptyList()) : ViewState
+    data class State(
+        val isLoading: Boolean = false,
+        val photoList: List<PhotoInfo> = emptyList()
+    ) : ViewState
 
     sealed interface Event : ViewEvent
 

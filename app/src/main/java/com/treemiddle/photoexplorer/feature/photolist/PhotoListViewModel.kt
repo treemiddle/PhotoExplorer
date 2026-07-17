@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.treemiddle.photoexplorer.base.BaseViewModelV4
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,12 +27,22 @@ class PhotoListViewModel @Inject constructor(
     }
 
     private fun getPhotoList() {
+        setState {
+            copy(isLoading = true)
+        }
         viewModelScope.launch {
             runCatching {
                 photoRepository.getPhotoList(1)
             }.onSuccess {
                 setState {
-                    copy(photoList = it.list)
+                    copy(
+                        isLoading = false,
+                        photoList = it.list
+                    )
+                }
+            }.onFailure {
+                setState {
+                    copy(isLoading = false)
                 }
             }
         }
