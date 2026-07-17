@@ -37,12 +37,14 @@ import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun PhotoListScreen(
+    onNavigateToDetail: (String) -> Unit,
     viewModel: PhotoListViewModel = hiltViewModel()
 ) {
     Screen(
         state = viewModel.viewState.collectAsStateWithLifecycle().value,
         effectFlow = viewModel.effect,
-        onEventSent = viewModel::handleEvents
+        onEventSent = viewModel::handleEvents,
+        onNavigateToDetail = onNavigateToDetail
     )
 }
 
@@ -51,11 +53,12 @@ private fun Screen(
     state: PhotoListContract.State,
     effectFlow: Flow<PhotoListContract.Effect>?,
     onEventSent: (event: PhotoListContract.Event) -> Unit,
+    onNavigateToDetail: (String) -> Unit,
 ) {
     LaunchedEffect(key1 = true) {
         effectFlow?.collect { effect ->
             when (effect) {
-                else -> {
+                else ->{
 
                 }
             }
@@ -67,6 +70,9 @@ private fun Screen(
         photoList = state.photoList,
         onRetryClick = {
             onEventSent(PhotoListContract.Event.OnRetryClick)
+        },
+        onPhotoClick = { photoId ->
+            onNavigateToDetail(photoId)
         },
         onLoadMore = {
             onEventSent(PhotoListContract.Event.LoadMore)
@@ -86,6 +92,7 @@ private fun Content(
     photoList: List<PhotoInfo>,
     onRetryClick: () -> Unit,
     onLoadMore: () -> Unit,
+    onPhotoClick: (String) -> Unit,
     isLoadingMore: Boolean = false,
     isLoadingMoreError: Boolean = false,
     onRetryLoadMore: () -> Unit = {}
@@ -132,6 +139,7 @@ private fun Content(
                         list = photoList,
                         onLoadMore = onLoadMore,
                         onRetryLoadMore = onRetryLoadMore,
+                        onPhotoClick = onPhotoClick,
                         isLoadingMore = isLoadingMore,
                         isLoadingMoreError = isLoadingMoreError
                     )
@@ -146,9 +154,10 @@ private fun List(
     list: List<PhotoInfo>,
     modifier: Modifier = Modifier,
     onLoadMore: () -> Unit,
+    onPhotoClick: (String) -> Unit,
     isLoadingMore: Boolean = false,
     isLoadingMoreError: Boolean = false,
-    onRetryLoadMore: () -> Unit = {}
+    onRetryLoadMore: () -> Unit = {},
 ) {
     val lazyGirdState = rememberLazyGridState()
 
@@ -178,7 +187,7 @@ private fun List(
                 authorProfileImageUrl = it.authorProfileImageUrl,
                 isLiked = false,
                 onClick = {
-
+                    onPhotoClick(it.id)
                 },
                 onLikeClick = {
 
@@ -208,7 +217,8 @@ private fun P1() {
         isError = false,
         photoList = emptyList(),
         onRetryClick = {},
-        onLoadMore = {}
+        onLoadMore = {},
+        onPhotoClick = {}
     )
 }
 
@@ -238,7 +248,8 @@ private fun P2() {
             ),
         ),
         onRetryClick = {},
-        onLoadMore = {}
+        onLoadMore = {},
+        onPhotoClick = {}
     )
 }
 
@@ -253,7 +264,8 @@ private fun P3() {
         isError = true,
         photoList = emptyList(),
         onRetryClick = {},
-        onLoadMore = {}
+        onLoadMore = {},
+        onPhotoClick = {}
     )
 }
 
@@ -268,6 +280,7 @@ private fun P4() {
         isError = false,
         photoList = emptyList(),
         onRetryClick = {},
-        onLoadMore = {}
+        onLoadMore = {},
+        onPhotoClick = {}
     )
 }
