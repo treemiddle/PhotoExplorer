@@ -38,13 +38,15 @@ import kotlinx.coroutines.flow.Flow
 @Composable
 fun PhotoListScreen(
     onNavigateToDetail: (String) -> Unit,
+    onNavigateToLiked: () -> Unit,
     viewModel: PhotoListViewModel = hiltViewModel()
 ) {
     Screen(
         state = viewModel.viewState.collectAsStateWithLifecycle().value,
         effectFlow = viewModel.effect,
         onEventSent = viewModel::handleEvents,
-        onNavigateToDetail = onNavigateToDetail
+        onNavigateToDetail = onNavigateToDetail,
+        onNavigateToLiked = onNavigateToLiked
     )
 }
 
@@ -54,6 +56,7 @@ private fun Screen(
     effectFlow: Flow<PhotoListContract.Effect>?,
     onEventSent: (event: PhotoListContract.Event) -> Unit,
     onNavigateToDetail: (String) -> Unit,
+    onNavigateToLiked: () -> Unit
 ) {
     LaunchedEffect(key1 = true) {
         effectFlow?.collect { effect ->
@@ -74,6 +77,7 @@ private fun Screen(
         onPhotoClick = { photoId ->
             onNavigateToDetail(photoId)
         },
+        onLikeClick = onNavigateToLiked,
         onLoadMore = {
             onEventSent(PhotoListContract.Event.LoadMore)
         },
@@ -93,6 +97,7 @@ private fun Content(
     onRetryClick: () -> Unit,
     onLoadMore: () -> Unit,
     onPhotoClick: (String) -> Unit,
+    onLikeClick: () -> Unit,
     isLoadingMore: Boolean = false,
     isLoadingMoreError: Boolean = false,
     onRetryLoadMore: () -> Unit = {}
@@ -102,7 +107,7 @@ private fun Content(
             TopBar(
                 title = stringResource(id = R.string.app_name),
                 actions = {
-                    IconButton(onClick = rememberSingleClick(onClick = {})) {
+                    IconButton(onClick = rememberSingleClick(onClick = onLikeClick)) {
                         Icon(
                             imageVector = Icons.Filled.Favorite,
                             contentDescription = stringResource(R.string.content_description_photo_list_topbar_like),
@@ -218,7 +223,8 @@ private fun P1() {
         photoList = emptyList(),
         onRetryClick = {},
         onLoadMore = {},
-        onPhotoClick = {}
+        onPhotoClick = {},
+        onLikeClick = {}
     )
 }
 
@@ -249,7 +255,8 @@ private fun P2() {
         ),
         onRetryClick = {},
         onLoadMore = {},
-        onPhotoClick = {}
+        onPhotoClick = {},
+        onLikeClick = {}
     )
 }
 
@@ -265,7 +272,8 @@ private fun P3() {
         photoList = emptyList(),
         onRetryClick = {},
         onLoadMore = {},
-        onPhotoClick = {}
+        onPhotoClick = {},
+        onLikeClick = {}
     )
 }
 
@@ -281,6 +289,7 @@ private fun P4() {
         photoList = emptyList(),
         onRetryClick = {},
         onLoadMore = {},
-        onPhotoClick = {}
+        onPhotoClick = {},
+        onLikeClick = {}
     )
 }

@@ -5,6 +5,8 @@ object Route {
 
     const val PHOTO_ID = "photoId"
 
+    const val LIKED_PHOTO_LIST = "liked_photo_list"
+
     val DETAIL get() =  "$PHOTO_DETAIL/{$PHOTO_ID}"
 
     private const val PHOTO_DETAIL = "photo_detail"
