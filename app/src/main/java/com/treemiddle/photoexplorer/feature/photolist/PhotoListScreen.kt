@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
@@ -23,10 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.treemiddle.photoexplorer.R
+import com.treemiddle.photoexplorer.common.designsystem.FooterLoading
 import com.treemiddle.photoexplorer.common.designsystem.FullScreenError
 import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
 import com.treemiddle.photoexplorer.common.designsystem.PhotoCard
 import com.treemiddle.photoexplorer.common.designsystem.TopBar
+import com.treemiddle.photoexplorer.core.extension.LoadMoreEffect
 import com.treemiddle.photoexplorer.core.extension.rememberSingleClick
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
 import kotlinx.coroutines.flow.Flow
@@ -63,7 +67,15 @@ private fun Screen(
         photoList = state.photoList,
         onRetryClick = {
             onEventSent(PhotoListContract.Event.OnRetryClick)
-        }
+        },
+        onLoadMore = {
+            onEventSent(PhotoListContract.Event.LoadMore)
+        },
+        onRetryLoadMore = {
+            onEventSent(PhotoListContract.Event.RetryLoadMore)
+        },
+        isLoadingMore = state.isLoadingMore,
+        isLoadingMoreError = state.isLoadingMoreError
     )
 }
 
@@ -73,6 +85,10 @@ private fun Content(
     isError: Boolean,
     photoList: List<PhotoInfo>,
     onRetryClick: () -> Unit,
+    onLoadMore: () -> Unit,
+    isLoadingMore: Boolean = false,
+    isLoadingMoreError: Boolean = false,
+    onRetryLoadMore: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -112,7 +128,13 @@ private fun Content(
                 }
 
                 else -> {
-                    List(list = photoList)
+                    List(
+                        list = photoList,
+                        onLoadMore = onLoadMore,
+                        onRetryLoadMore = onRetryLoadMore,
+                        isLoadingMore = isLoadingMore,
+                        isLoadingMoreError = isLoadingMoreError
+                    )
                 }
             }
         }
@@ -122,11 +144,23 @@ private fun Content(
 @Composable
 private fun List(
     list: List<PhotoInfo>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLoadMore: () -> Unit,
+    isLoadingMore: Boolean = false,
+    isLoadingMoreError: Boolean = false,
+    onRetryLoadMore: () -> Unit = {}
 ) {
+    val lazyGirdState = rememberLazyGridState()
+
+    lazyGirdState.LoadMoreEffect(
+        itemCount = list.size,
+        onLoadMore = onLoadMore
+    )
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(count = 2),
         modifier = modifier,
+        state = lazyGirdState,
         contentPadding = PaddingValues(all = 10.dp),
         verticalArrangement = Arrangement.spacedBy(space = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(space = 10.dp)
@@ -151,6 +185,15 @@ private fun List(
                 }
             )
         }
+        if (isLoadingMore || isLoadingMoreError) {
+            item(span = { GridItemSpan(currentLineSpan = maxLineSpan) }) {
+                FooterLoading(
+                    isLoading = isLoadingMore,
+                    isError = isLoadingMoreError,
+                    onRetry = onRetryLoadMore
+                )
+            }
+        }
     }
 }
 
@@ -164,7 +207,8 @@ private fun P1() {
         isLoading = true,
         isError = false,
         photoList = emptyList(),
-        onRetryClick = {}
+        onRetryClick = {},
+        onLoadMore = {}
     )
 }
 
@@ -193,7 +237,8 @@ private fun P2() {
                 authorProfileImageUrl = ""
             ),
         ),
-        onRetryClick = {}
+        onRetryClick = {},
+        onLoadMore = {}
     )
 }
 
@@ -207,7 +252,8 @@ private fun P3() {
         isLoading = false,
         isError = true,
         photoList = emptyList(),
-        onRetryClick = {}
+        onRetryClick = {},
+        onLoadMore = {}
     )
 }
 
@@ -221,6 +267,7 @@ private fun P4() {
         isLoading = false,
         isError = false,
         photoList = emptyList(),
-        onRetryClick = {}
+        onRetryClick = {},
+        onLoadMore = {}
     )
 }

@@ -3,7 +3,10 @@ package com.treemiddle.photoexplorer.remote.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-data class PhotoResponse(val list: List<PhotoInfo> = emptyList())
+data class PhotoResponse(
+    val list: List<PhotoInfo> = emptyList(),
+    val hasNext: Boolean = false
+)
 
 @Serializable
 data class PhotoInfo(

@@ -17,6 +17,7 @@ fun PhotoData.toDomain(): DomainPhotoData {
                 authorName = it.authorName,
                 authorProfileImageUrl = it.authorProfileImageUrl
             )
-        }
+        },
+        hasNext = hasNext
     )
 }

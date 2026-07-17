@@ -9,11 +9,15 @@ sealed interface PhotoListContract {
     data class State(
         val isLoading: Boolean = false,
         val isError: Boolean = false,
-        val photoList: List<PhotoInfo> = emptyList()
+        val photoList: List<PhotoInfo> = emptyList(),
+        val isLoadingMore: Boolean = false,
+        val isLoadingMoreError: Boolean = false
     ) : ViewState
 
     sealed interface Event : ViewEvent {
         data object OnRetryClick : Event
+        data object LoadMore : Event
+        data object RetryLoadMore : Event
     }
 
     sealed interface Effect : ViewSideEffect

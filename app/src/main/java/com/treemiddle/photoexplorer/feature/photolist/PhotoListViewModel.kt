@@ -11,6 +11,9 @@ import javax.inject.Inject
 class PhotoListViewModel @Inject constructor(
     private val photoRepository: PhotoRepository
 ) : BaseViewModelV4<PhotoListContract.Event, PhotoListContract.State, PhotoListContract.Effect>() {
+    private var hasNextPage = false
+    private var page = 1
+
     override fun setInitialState(): PhotoListContract.State {
         return PhotoListContract.State()
     }
@@ -19,6 +22,14 @@ class PhotoListViewModel @Inject constructor(
         when (event) {
             PhotoListContract.Event.OnRetryClick -> {
                 getPhotoList()
+            }
+
+            PhotoListContract.Event.LoadMore -> {
+                loadMore()
+            }
+
+            PhotoListContract.Event.RetryLoadMore -> {
+                retryLoadMore()
             }
         }
     }
@@ -36,7 +47,7 @@ class PhotoListViewModel @Inject constructor(
         }
         viewModelScope.launch {
             runCatching {
-                photoRepository.getPhotoList(1)
+                photoRepository.getPhotoList(page = page)
             }.onSuccess {
                 setState {
                     copy(
@@ -45,6 +56,7 @@ class PhotoListViewModel @Inject constructor(
                         photoList = it.list
                     )
                 }
+                updatePaging(hasNext = it.hasNext)
             }.onFailure {
                 setState {
                     copy(
@@ -54,5 +66,51 @@ class PhotoListViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun loadMore() {
+        if (
+            hasNextPage.not() ||
+            viewState.value.isLoadingMore ||
+            viewState.value.isLoadingMoreError
+        ) {
+            return
+        }
+        setState {
+            copy(isLoadingMore = true)
+        }
+        viewModelScope.launch {
+            runCatching {
+                photoRepository.getPhotoList(page = page)
+            }.onSuccess {
+                setState {
+                    copy(
+                        isLoadingMore = false,
+                        isLoadingMoreError = false,
+                        photoList = photoList + it.list
+                    )
+                }
+                updatePaging(hasNext = it.hasNext)
+            }.onFailure {
+                setState {
+                    copy(
+                        isLoadingMore = false,
+                        isLoadingMoreError = true
+                    )
+                }
+            }
+        }
+    }
+
+    private fun retryLoadMore() {
+        setState {
+            copy(isLoadingMoreError = false)
+        }
+        loadMore()
+    }
+
+    private fun updatePaging(hasNext: Boolean) {
+        page++
+        hasNextPage = hasNext
     }
 }

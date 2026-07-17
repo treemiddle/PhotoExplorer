@@ -1,6 +1,9 @@
 package com.treemiddle.photoexplorer.data.model
 
-data class PhotoData(val list: List<PhotoInfo> = emptyList())
+data class PhotoData(
+    val list: List<PhotoInfo> = emptyList(),
+    val hasNext: Boolean = false
+)
 
 data class PhotoInfo(
     val id: String = "",

@@ -23,6 +23,7 @@ fun PhotoResponse.toData(): PhotoData {
                     it.user.profileImage.small
                 },
             )
-        }
+        },
+        hasNext = hasNext
     )
 }

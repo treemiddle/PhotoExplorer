@@ -16,6 +16,9 @@ class PhotoExplorerRemoteDataSourceImpl @Inject constructor(
             throw HttpException(response)
         }
 
-        return PhotoResponse(list = response.body().orEmpty()).toData()
+        return PhotoResponse(
+            list = response.body().orEmpty(),
+            hasNext = LinkHeader.hasNext(header = response.headers()["Link"])
+        ).toData()
     }
 }
