@@ -39,6 +39,9 @@ fun NavHost(controller: NavHostController = rememberNavController()) {
             LikedPhotoListScreen(
                 onNavigateBack = {
                     controller.popBackStack()
+                },
+                onNavigateToDetail = { photoId ->
+                    controller.navigate(route = Route.detail(photoId = photoId))
                 }
             )
         }

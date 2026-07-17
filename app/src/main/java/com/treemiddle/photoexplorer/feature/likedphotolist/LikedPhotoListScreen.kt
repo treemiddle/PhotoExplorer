@@ -23,13 +23,15 @@ import java.io.File
 @Composable
 fun LikedPhotoListScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToDetail: (String) -> Unit,
     viewModel: LikedPhotoListViewModel = hiltViewModel()
 ) {
     Screen(
         state = viewModel.viewState.collectAsStateWithLifecycle().value,
         effectFlow = viewModel.effect,
         onEventSent = viewModel::handleEvents,
-        onNavigateBack = onNavigateBack
+        onNavigateBack = onNavigateBack,
+        onNavigateToDetail = onNavigateToDetail
     )
 }
 
@@ -39,6 +41,7 @@ private fun Screen(
     effectFlow: Flow<LikedPhotoListContract.Effect>?,
     onEventSent: (event: LikedPhotoListContract.Event) -> Unit,
     onNavigateBack: () -> Unit,
+    onNavigateToDetail: (String) -> Unit
 ) {
    Content(
        isLoading = state.isLoading,
@@ -47,7 +50,8 @@ private fun Screen(
        onBackButtonClick = onNavigateBack,
        onLoadMore = {
            onEventSent(LikedPhotoListContract.Event.LoadMore)
-       }
+       },
+       onPhotoClick = onNavigateToDetail
    )
 }
 
@@ -57,7 +61,8 @@ private fun Content(
     photoList: List<LikedPhotoCard>,
     isLoadingMore: Boolean,
     onBackButtonClick: () -> Unit,
-    onLoadMore: () -> Unit
+    onLoadMore: () -> Unit,
+    onPhotoClick: (String) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -85,7 +90,8 @@ private fun Content(
                     List(
                         list = photoList,
                         isLoadingMore = isLoadingMore,
-                        onLoadMore = onLoadMore
+                        onLoadMore = onLoadMore,
+                        onPhotoClick = onPhotoClick
                     )
                 }
             }
@@ -98,6 +104,7 @@ private fun List(
     list: List<LikedPhotoCard>,
     isLoadingMore: Boolean,
     onLoadMore: () -> Unit,
+    onPhotoClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     PhotoList(
@@ -117,7 +124,7 @@ private fun List(
             authorProfileImageUrl = it.authorProfileImageUrl,
             isLiked = it.isLiked,
             onClick = {
-
+                onPhotoClick(it.id)
             },
             onLikeClick = {
 
