@@ -47,7 +47,7 @@ fun LikedPhotoCard.toLikedPhotoRequest(): LikedPhotoRequest {
         description = description,
         authorName = authorName,
         authorProfileImageUrl = authorProfileImageUrl,
-        imageUrl = localImagePath,
+        imageUrl = remoteImageUrl,
         width = width,
         height = height
     )

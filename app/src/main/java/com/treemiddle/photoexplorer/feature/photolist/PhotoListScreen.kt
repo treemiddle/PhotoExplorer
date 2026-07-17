@@ -179,18 +179,18 @@ private fun List(
         isLoadingMore = isLoadingMore,
         isLoadingMoreError = isLoadingMoreError,
         onRetryLoadMore = onRetryLoadMore
-    ) {
+    ) { item ->
         PhotoCard(
-            image = it.thumbUrl,
-            description = it.description,
-            authorName = it.authorName,
-            authorProfileImageUrl = it.authorProfileImageUrl,
-            isLiked = it.isLiked,
+            image = item.thumbUrl,
+            description = item.description,
+            authorName = item.authorName,
+            authorProfileImageUrl = item.authorProfileImageUrl,
+            isLiked = item.isLiked,
             onClick = {
-                onPhotoClick(it.id)
+                onPhotoClick(item.id)
             },
             onLikeClick = {
-                onPhotoLikeClick(it.id)
+                onPhotoLikeClick(item.id)
             }
         )
     }

@@ -23,18 +23,19 @@ class LikeRepositoryImpl @Inject constructor(
 
     override fun observeIsLiked(id: String): Flow<Boolean> = localDataSource.observeIsLiked(id = id)
 
-    override suspend fun updatePhoto(photo: LikedPhotoRequest) {
-        val mutex = likeIdHashMap.getOrPut(
-            key = photo.id,
-            defaultValue = {
-                Mutex()
-            }
-        )
-        mutex.withLock {
+    override suspend fun like(photo: LikedPhotoRequest) {
+        mutexOf(id = photo.id).withLock {
             if (localDataSource.hasId(id = photo.id)) {
-                unlike(id = photo.id)
-            } else {
-                like(photo = photo)
+                return@withLock
+            }
+            savePhoto(photo = photo)
+        }
+    }
+
+    override suspend fun unlike(photoId: String) {
+        mutexOf(id = photoId).withLock {
+            if (localDataSource.hasId(id = photoId)) {
+                localDataSource.deleteImage(id = photoId)
             }
         }
     }
@@ -53,7 +54,7 @@ class LikeRepositoryImpl @Inject constructor(
         return localDataSource.getLikedPhoto(id = photoId)?.toDomain()
     }
 
-    private suspend fun like(photo: LikedPhotoRequest) {
+    private suspend fun savePhoto(photo: LikedPhotoRequest) {
         runCatching {
             remoteDataSource.trackDownloadApi(id = photo.id)
         }
@@ -76,7 +77,12 @@ class LikeRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun unlike(id: String) {
-        localDataSource.deleteImage(id = id)
+    private fun mutexOf(id: String): Mutex {
+        return likeIdHashMap.getOrPut(
+            key = id,
+            defaultValue = {
+                Mutex()
+            }
+        )
     }
 }

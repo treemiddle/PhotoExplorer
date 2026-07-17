@@ -101,7 +101,11 @@ class PhotoListViewModel @Inject constructor(
                     copy(
                         isLoadingMore = false,
                         isLoadingMoreError = false,
-                        photoList = (photoList + it.list).withLikeState()
+                        photoList = (photoList + it.list)
+                            .distinctBy { photo ->
+                                photo.id
+                            }
+                            .withLikeState()
                     )
                 }
                 updatePaging(hasNext = it.hasNext)
@@ -143,16 +147,20 @@ class PhotoListViewModel @Inject constructor(
         )
         viewModelScope.launch {
             runCatching {
-                likedRepository.updatePhoto(photo = photoCard.toLikedPhotoRequest())
+                if (photoCard.isLiked) {
+                    likedRepository.unlike(photoId = photoCard.id)
+                } else {
+                    likedRepository.like(photo = photoCard.toLikedPhotoRequest())
+                }
             }.onFailure {
                 updateLiked(
                     photoId = photoId,
                     isLiked = photoId in likedIds
                 )
-                val message = if (it is StorageException) {
-                    UserMessage.STORAGE_FULL
-                } else {
-                    UserMessage.LIKE_FAILED
+                val message = when {
+                    it is StorageException -> UserMessage.STORAGE_FULL
+                    photoCard.isLiked -> UserMessage.UNLIKE_FAILED
+                    else -> UserMessage.LIKE_FAILED
                 }
                 setEffect {
                     PhotoListContract.Effect.ShowMessage(message = message)

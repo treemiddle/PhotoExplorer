@@ -102,8 +102,12 @@ class PhotoDetailViewModel @Inject constructor(
     }
 
     private fun onPhotoLikeClick() {
-        val request = viewState.value.request ?: return
         if (likeProcessing) {
+            return
+        }
+        val isLiked = viewState.value.isLiked
+        val request = viewState.value.request
+        if (isLiked.not() && request == null) {
             return
         }
 
@@ -113,15 +117,19 @@ class PhotoDetailViewModel @Inject constructor(
         }
         viewModelScope.launch {
             runCatching {
-                likedRepository.updatePhoto(photo = request)
+                if (isLiked) {
+                    likedRepository.unlike(photoId = photoId)
+                } else if (request != null) {
+                    likedRepository.like(photo = request)
+                }
             }.onFailure {
                 setState {
                     copy(isLiked = isLikedInDatabase)
                 }
-                val message = if (it is StorageException) {
-                    UserMessage.STORAGE_FULL
-                } else {
-                    UserMessage.LIKE_FAILED
+                val message = when {
+                    it is StorageException -> UserMessage.STORAGE_FULL
+                    isLiked -> UserMessage.UNLIKE_FAILED
+                    else -> UserMessage.LIKE_FAILED
                 }
                 setEffect {
                     PhotoDetailContract.Effect.ShowMessage(message = message)

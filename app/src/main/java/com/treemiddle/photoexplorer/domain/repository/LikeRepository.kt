@@ -9,7 +9,8 @@ interface LikeRepository {
 
     fun observeIsLiked(id: String): Flow<Boolean>
 
-    suspend fun updatePhoto(photo: LikedPhotoRequest)
+    suspend fun like(photo: LikedPhotoRequest)
+    suspend fun unlike(photoId: String)
     suspend fun getLikedPhotoList(
         limit: Int,
         offset: Int

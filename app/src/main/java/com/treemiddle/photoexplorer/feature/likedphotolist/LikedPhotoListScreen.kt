@@ -141,18 +141,18 @@ private fun List(
         modifier = modifier,
         isLoadingMore = isLoadingMore,
         isLoadingMoreError = false
-    ) {
+    ) { item ->
         PhotoCard(
-            image = File(it.localImagePath),
-            description = it.description,
-            authorName = it.authorName,
-            authorProfileImageUrl = it.authorProfileImageUrl,
-            isLiked = it.isLiked,
+            image = File(item.localImagePath),
+            description = item.description,
+            authorName = item.authorName,
+            authorProfileImageUrl = item.authorProfileImageUrl,
+            isLiked = item.isLiked,
             onClick = {
-                onPhotoClick(it.id)
+                onPhotoClick(item.id)
             },
             onLikeClick = {
-                onUnlikeClick(it.id)
+                onUnlikeClick(item.id)
             }
         )
     }
@@ -194,7 +194,7 @@ private fun P2() {
 
 @Preview(
     showBackground = true,
-    name = "좋아요된 사진이 없는 화면"
+    name = "좋아요한 사진 목록 화면"
 )
 @Composable
 private fun P3() {

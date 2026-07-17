@@ -2,11 +2,9 @@ package com.treemiddle.photoexplorer.feature.likedphotolist
 
 import androidx.lifecycle.viewModelScope
 import com.treemiddle.photoexplorer.base.BaseViewModelV4
-import com.treemiddle.photoexplorer.domain.model.toLikedPhotoRequest
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.feature.photolist.model.UserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,8 +13,6 @@ class LikedPhotoListViewModel @Inject constructor(
     private val likeRepository: LikeRepository
 ) : BaseViewModelV4<LikedPhotoListContract.Event, LikedPhotoListContract.State, LikedPhotoListContract.Effect>() {
     private var hasNextPage = false
-
-    private val unlikeProcessingIds = mutableSetOf<String>()
 
     override fun setInitialState(): LikedPhotoListContract.State {
         return LikedPhotoListContract.State()
@@ -85,7 +81,9 @@ class LikedPhotoListViewModel @Inject constructor(
                 setState {
                     copy(
                         isLoadingMore = false,
-                        photoList = photoList + it
+                        photoList = (photoList + it).distinctBy { photo ->
+                            photo.id
+                        }
                     )
                 }
                 updateNextPage(size = it.size)
@@ -102,34 +100,31 @@ class LikedPhotoListViewModel @Inject constructor(
     }
 
     private fun unLikeClick(photoId: String) {
-        if (photoId in unlikeProcessingIds) {
-            return
-        }
-        val photo = viewState.value.photoList.find {
-            it.id == photoId
-        } ?: return
-
-        unlikeProcessingIds += photoId
         viewModelScope.launch {
             runCatching {
-                likeRepository.updatePhoto(photo = photo.toLikedPhotoRequest())
+                likeRepository.unlike(photoId = photoId)
             }.onFailure {
                 setEffect {
                     LikedPhotoListContract.Effect.ShowMessage(message = UserMessage.UNLIKE_FAILED)
                 }
             }
-            unlikeProcessingIds -= photoId
         }
     }
 
     private fun observeLikedIds() {
         viewModelScope.launch {
-            likeRepository.likedIds.drop(1).collect { ids ->
+            var previousIds: Set<String>? = null
+            likeRepository.likedIds.collect { ids ->
+                val prev = previousIds
+                previousIds = ids
+                if (prev == null) {
+                    return@collect
+                }
                 val current = viewState.value.photoList
                 val currentIds = current.map { it.id }.toSet()
                 val newestLikedAt = current.firstOrNull()?.likedAt ?: 0L
 
-                val hasAdded = (ids - currentIds).isNotEmpty()
+                val hasAdded = (ids - prev).isNotEmpty()
                 val newPhotos = if (hasAdded) {
                     runCatching {
                         likeRepository.getLikedPhotoList(
@@ -145,6 +140,9 @@ class LikedPhotoListViewModel @Inject constructor(
                 setState {
                     copy(
                         photoList = (newPhotos + photoList)
+                            .distinctBy {
+                                it.id
+                            }
                             .filter {
                                 it.id in ids
                             }
