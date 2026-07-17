@@ -64,7 +64,7 @@ internal interface NetworkModule {
         @Provides
         @Singleton
         fun providesPhotoExplorerInterceptor(): PhotoExplorerInterceptor {
-            return PhotoExplorerInterceptor(BuildConfig.UNSPLASH_ACCESS_KEY)
+            return PhotoExplorerInterceptor(accessKey = BuildConfig.UNSPLASH_ACCESS_KEY)
         }
 
         @Provides

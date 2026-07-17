@@ -3,7 +3,7 @@ package com.treemiddle.photoexplorer.remote.interceptor
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class PhotoExplorerInterceptor(private val accessKey: String) : Interceptor {
+class PhotoExplorerInterceptor(val accessKey: String) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val original = chain.request()
         if (original.url.host != UNSPLASH_API_HOST) {

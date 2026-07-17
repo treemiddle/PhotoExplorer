@@ -73,7 +73,7 @@ class PhotoDetailViewModel @Inject constructor(
     private fun getLocalPhoto() {
         viewModelScope.launch {
             val localPhoto = runCatching {
-                likedRepository.getLikedPhoto(photoId)
+                likedRepository.getLikedPhoto(photoId = photoId)
             }.getOrNull()
             if (localPhoto == null) {
                 setState {

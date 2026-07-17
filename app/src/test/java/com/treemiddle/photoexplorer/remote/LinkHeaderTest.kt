@@ -17,7 +17,7 @@ class LinkHeaderTest {
         val header = full
 
         // when
-        val result = LinkHeader.hasNext(header)
+        val result = LinkHeader.hasNext(header = header)
 
         // then
         assertTrue(result)
@@ -29,7 +29,7 @@ class LinkHeaderTest {
         val header = """<https://api.unsplash.com/photos?page=2>; rel="next""""
 
         // when
-        val result = LinkHeader.hasNext(header)
+        val result = LinkHeader.hasNext(header = header)
 
         // then
         assertTrue(result)
@@ -44,7 +44,7 @@ class LinkHeaderTest {
                     """<https://api.unsplash.com/photos?page=2>; rel="next""""
 
         // when
-        val result = LinkHeader.hasNext(header)
+        val result = LinkHeader.hasNext(header = header)
 
         // then
         assertTrue(result)
@@ -59,7 +59,7 @@ class LinkHeaderTest {
                     """<https://api.unsplash.com/photos?page=346>; rel="last""""
 
         // when
-        val result = LinkHeader.hasNext(header)
+        val result = LinkHeader.hasNext(header = header)
 
         // then
         assertFalse(result)
@@ -71,7 +71,7 @@ class LinkHeaderTest {
         val header: String? = null
 
         // when
-        val result = LinkHeader.hasNext(header)
+        val result = LinkHeader.hasNext(header = header)
 
         // then
         assertFalse(result)
@@ -83,7 +83,7 @@ class LinkHeaderTest {
         val header = ""
 
         // when
-        val result = LinkHeader.hasNext(header)
+        val result = LinkHeader.hasNext(header = header)
 
         // then
         assertFalse(result)
@@ -95,7 +95,7 @@ class LinkHeaderTest {
         val header = " "
 
         // when
-        val result = LinkHeader.hasNext(header)
+        val result = LinkHeader.hasNext(header = header)
 
         // then
         assertFalse(result)
@@ -107,7 +107,7 @@ class LinkHeaderTest {
         val header = """<https://api.unsplash.com/photos?page=2>; rel="nextpage""""
 
         // when
-        val result = LinkHeader.hasNext(header)
+        val result = LinkHeader.hasNext(header = header)
 
         // then
         assertFalse(result)

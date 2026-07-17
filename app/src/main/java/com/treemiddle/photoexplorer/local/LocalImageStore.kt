@@ -40,7 +40,7 @@ class LocalImageStore @Inject constructor(
                 target.absolutePath
             } catch (e: IOException) {
                 if (e.isNoSpaceLeft()) {
-                    throw StorageException(e)
+                    throw StorageException(cause = e)
                 }
                 throw e
             } finally {
