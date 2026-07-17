@@ -12,9 +12,10 @@ sealed interface PhotoDetailContract {
     data class State(
         val isLoading: Boolean = false,
         val isError: Boolean = false,
+        val isDetailError: Boolean = false,
         val isLiked: Boolean = false,
-        val photoDetail: PhotoDetail? = PhotoDetail(),
-        val localPhoto: LikedPhotoCard? = LikedPhotoCard()
+        val photoDetail: PhotoDetail? = null,
+        val localPhoto: LikedPhotoCard? = null
     ) : ViewState {
         val request = photoDetail?.toLikedPhotoRequest() ?: localPhoto?.toLikedPhotoRequest()
     }

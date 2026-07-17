@@ -11,7 +11,9 @@ fun LikedPhotoData.toLocal(): LikedPhotoCardEntity {
         authorProfileImageUrl = authorProfileImageUrl,
         localImagePath = localImagePath,
         remoteImageUrl = remoteImageUrl,
-        likedAt = likedAt
+        likedAt = likedAt,
+        width = width,
+        height = height
     )
 }
 
@@ -29,6 +31,8 @@ fun LikedPhotoCardEntity.toData(): LikedPhotoData {
         authorProfileImageUrl = authorProfileImageUrl,
         localImagePath = localImagePath,
         remoteImageUrl = remoteImageUrl,
-        likedAt = likedAt
+        likedAt = likedAt,
+        width = width,
+        height = height
     )
 }

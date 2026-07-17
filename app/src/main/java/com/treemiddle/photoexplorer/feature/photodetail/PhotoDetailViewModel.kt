@@ -9,7 +9,6 @@ import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
 import com.treemiddle.photoexplorer.feature.photolist.model.UserMessage
 import com.treemiddle.photoexplorer.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,62 +40,59 @@ class PhotoDetailViewModel @Inject constructor(
     }
 
     init {
-        getPhotoDetail()
+        loadPhoto()
         observeIsLiked()
+    }
+
+    private fun loadPhoto() {
+        setState {
+            copy(isLoading = true)
+        }
+        viewModelScope.launch {
+            val localPhoto = runCatching {
+                likedRepository.getLikedPhoto(photoId = photoId)
+            }.getOrNull()
+            if (localPhoto != null) {
+                setState {
+                    copy(
+                        isLoading = false,
+                        localPhoto = localPhoto
+                    )
+                }
+            }
+            getPhotoDetail()
+        }
     }
 
     private fun getPhotoDetail() {
         setState {
             copy(
-                isLoading = true,
-                isError = false
+                isLoading = localPhoto == null,
+                isError = false,
+                isDetailError = false
             )
         }
         viewModelScope.launch {
             runCatching {
-                delay(2000)
                 photoRepository.getPhotoDetail(id = photoId)
             }.onSuccess {
                 setState {
                     copy(
                         isLoading = false,
-                        photoDetail = it,
-                        localPhoto = null
+                        photoDetail = it
                     )
                 }
             }.onFailure {
-                getLocalPhoto()
-            }
-        }
-    }
-
-    private fun getLocalPhoto() {
-        viewModelScope.launch {
-            val localPhoto = runCatching {
-                likedRepository.getLikedPhoto(photoId = photoId)
-            }.getOrNull()
-            if (localPhoto == null) {
                 setState {
-                    copy(
-                        isLoading = false,
-                        isError = true,
-                        localPhoto = null,
-                        photoDetail = null
-                    )
+                    if (localPhoto == null) {
+                        copy(
+                            isLoading = false,
+                            isError = true
+                        )
+                    } else {
+                        copy(isDetailError = true)
+                    }
                 }
-            } else {
-                setState {
-                    copy(
-                        isLoading = false,
-                        isError = false,
-                        localPhoto = localPhoto,
-                        photoDetail = null
-                    )
-                }
-                setEffect {
-                    PhotoDetailContract.Effect.ShowMessage(message = UserMessage.DETAIL_INFO_ERROR)
-                }
-                isLikedInDatabase = true
             }
         }
     }

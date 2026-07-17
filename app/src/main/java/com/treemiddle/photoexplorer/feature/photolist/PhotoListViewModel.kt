@@ -158,9 +158,17 @@ class PhotoListViewModel @Inject constructor(
                     isLiked = photoId in likedIds
                 )
                 val message = when {
-                    it is StorageException -> UserMessage.STORAGE_FULL
-                    photoCard.isLiked -> UserMessage.UNLIKE_FAILED
-                    else -> UserMessage.LIKE_FAILED
+                    it is StorageException -> {
+                        UserMessage.STORAGE_FULL
+                    }
+
+                    photoCard.isLiked -> {
+                        UserMessage.UNLIKE_FAILED
+                    }
+
+                    else -> {
+                        UserMessage.LIKE_FAILED
+                    }
                 }
                 setEffect {
                     PhotoListContract.Effect.ShowMessage(message = message)

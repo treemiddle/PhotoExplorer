@@ -12,5 +12,7 @@ data class LikedPhotoCardEntity(
     val authorProfileImageUrl: String,
     val localImagePath: String,
     val remoteImageUrl: String,
-    val likedAt: Long
+    val likedAt: Long,
+    val width: Int,
+    val height: Int
 )

@@ -1,22 +1,29 @@
 package com.treemiddle.photoexplorer.feature.photodetail
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,6 +39,7 @@ import com.treemiddle.photoexplorer.common.designsystem.RemoteImage
 import com.treemiddle.photoexplorer.common.designsystem.Stats
 import com.treemiddle.photoexplorer.common.designsystem.TagList
 import com.treemiddle.photoexplorer.common.designsystem.TopBar
+import com.treemiddle.photoexplorer.core.extension.rememberSingleClick
 import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
 import com.treemiddle.photoexplorer.domain.model.PhotoDetail
 import kotlinx.coroutines.flow.Flow
@@ -74,6 +82,7 @@ private fun Screen(
     Content(
         isLoading = state.isLoading,
         isError = state.isError,
+        isDetailError = state.isDetailError,
         isLiked = state.isLiked,
         photoDetail = state.photoDetail,
         localPhoto = state.localPhoto,
@@ -91,6 +100,7 @@ private fun Screen(
 private fun Content(
     isLoading: Boolean,
     isError: Boolean,
+    isDetailError: Boolean,
     isLiked: Boolean,
     photoDetail: PhotoDetail?,
     localPhoto: LikedPhotoCard?,
@@ -137,6 +147,8 @@ private fun Content(
                         description = (photoDetail?.description
                             ?: localPhoto?.description).orEmpty(),
                         photoDetail = photoDetail,
+                        isDetailError = isDetailError,
+                        onRetryClick = onRetryClick,
                         image = {
                             when {
                                 photoDetail != null -> {
@@ -175,6 +187,8 @@ private fun List(
     profileImageUrl: String,
     description: String,
     photoDetail: PhotoDetail?,
+    isDetailError: Boolean,
+    onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
     image: @Composable () -> Unit,
 ) {
@@ -187,8 +201,18 @@ private fun List(
             description = description,
             image = image
         )
-        if (photoDetail != null) {
-            makeBody(photoDetail = photoDetail)
+        when {
+            photoDetail != null -> {
+                makeBody(photoDetail = photoDetail)
+            }
+
+            isDetailError -> {
+                makeDetailError(onRetryClick = onRetryClick)
+            }
+
+            else -> {
+                makeDetailLoading()
+            }
         }
     }
 }
@@ -216,6 +240,43 @@ private fun LazyListScope.makeHeader(
                 text = description,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = modifier
+            )
+        }
+    }
+}
+
+private fun LazyListScope.makeDetailError(onRetryClick: () -> Unit) {
+    item {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(all = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(space = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(id = R.string.detail_info_error_text),
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+            )
+            Button(onClick = rememberSingleClick(onClick = onRetryClick)) {
+                Text(text = stringResource(id = R.string.retry_text))
+            }
+        }
+    }
+}
+
+private fun LazyListScope.makeDetailLoading() {
+    item {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(all = 24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(size = 24.dp),
+                strokeWidth = 2.dp
             )
         }
     }
