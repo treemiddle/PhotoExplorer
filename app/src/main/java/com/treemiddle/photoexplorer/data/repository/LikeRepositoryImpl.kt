@@ -6,6 +6,7 @@ import com.treemiddle.photoexplorer.data.mapper.toData
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
 import com.treemiddle.photoexplorer.domain.model.toLikedPhotoRequest
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.ConcurrentHashMap
@@ -15,6 +16,8 @@ class LikeRepositoryImpl @Inject constructor(
     private val remoteDataSource: PhotoExplorerRemoteDataSource,
     private val localDataSource: PhotoLocalDataSource
 ) : LikeRepository {
+    override val likedIds: Flow<Set<String>> = localDataSource.likedIds
+
     private val likeIdHashMap = ConcurrentHashMap<String, Mutex>()
 
     override suspend fun addPhoto(photoInfo: PhotoInfo) {

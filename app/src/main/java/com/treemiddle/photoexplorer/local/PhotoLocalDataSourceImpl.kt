@@ -4,12 +4,18 @@ import com.treemiddle.photoexplorer.data.datasource.PhotoLocalDataSource
 import com.treemiddle.photoexplorer.data.model.LikedPhotoData
 import com.treemiddle.photoexplorer.local.dao.LikedPhotoDao
 import com.treemiddle.photoexplorer.local.mapper.toLocal
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class PhotoLocalDataSourceImpl @Inject constructor(
     private val likedPhotoDao: LikedPhotoDao,
     private val localImageStore: LocalImageStore
 ) : PhotoLocalDataSource {
+    override val likedIds: Flow<Set<String>> = likedPhotoDao.observeLikedIds().map {
+        it.toSet()
+    }
+
     override suspend fun addPhotoCard(photoCard: LikedPhotoData) {
         likedPhotoDao.add(photoCard.toLocal())
     }

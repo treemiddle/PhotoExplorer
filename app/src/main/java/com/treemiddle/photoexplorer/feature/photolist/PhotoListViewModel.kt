@@ -3,6 +3,8 @@ package com.treemiddle.photoexplorer.feature.photolist
 import androidx.lifecycle.viewModelScope
 import com.treemiddle.photoexplorer.base.BaseViewModelV4
 import com.treemiddle.photoexplorer.core.exception.StorageException
+import com.treemiddle.photoexplorer.domain.model.PhotoInfo
+import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
 import com.treemiddle.photoexplorer.domain.usecase.SelectPhotoUseCase
 import com.treemiddle.photoexplorer.feature.photolist.model.UserMessage
@@ -13,10 +15,14 @@ import javax.inject.Inject
 @HiltViewModel
 class PhotoListViewModel @Inject constructor(
     private val selectPhotoUseCase: SelectPhotoUseCase,
-    private val photoRepository: PhotoRepository
+    private val photoRepository: PhotoRepository,
+    private val likedRepository: LikeRepository
 ) : BaseViewModelV4<PhotoListContract.Event, PhotoListContract.State, PhotoListContract.Effect>() {
     private var hasNextPage = false
     private var page = 1
+
+    private val likeProcessingIds = mutableSetOf<String>()
+    private var likedIds: Set<String> = emptySet()
 
     override fun setInitialState(): PhotoListContract.State {
         return PhotoListContract.State()
@@ -44,6 +50,7 @@ class PhotoListViewModel @Inject constructor(
 
     init {
         getPhotoList()
+        observeLikedIds()
     }
 
     private fun getPhotoList() {
@@ -61,7 +68,7 @@ class PhotoListViewModel @Inject constructor(
                     copy(
                         isLoading = false,
                         isError = false,
-                        photoList = it.list
+                        photoList = it.list.withLikeState()
                     )
                 }
                 updatePaging(hasNext = it.hasNext)
@@ -95,7 +102,7 @@ class PhotoListViewModel @Inject constructor(
                     copy(
                         isLoadingMore = false,
                         isLoadingMoreError = false,
-                        photoList = photoList + it.list
+                        photoList = (photoList + it.list).withLikeState()
                     )
                 }
                 updatePaging(hasNext = it.hasNext)
@@ -123,14 +130,26 @@ class PhotoListViewModel @Inject constructor(
     }
 
     private fun onPhotoLikeClick(photoId: String) {
+        if (photoId in likeProcessingIds) {
+            return
+        }
         val photoCard = viewState.value.photoList.find {
             it.id == photoId
         } ?: return
-        updateLiked(photoId = photoCard.id)
+
+        likeProcessingIds += photoId
+        updateLiked(
+            photoId = photoCard.id,
+            isLiked = photoCard.isLiked.not()
+        )
         viewModelScope.launch {
             runCatching {
                 selectPhotoUseCase(photoCard)
             }.onFailure {
+                updateLiked(
+                    photoId = photoId,
+                    isLiked = photoId in likedIds
+                )
                 val message = if (it is StorageException) {
                     UserMessage.STORAGE_FULL
                 } else {
@@ -140,20 +159,49 @@ class PhotoListViewModel @Inject constructor(
                     PhotoListContract.Effect.ShowMessage(message = message)
                 }
             }
+            likeProcessingIds -= photoId
         }
     }
 
-    private fun updateLiked(photoId: String) {
+    private fun updateLiked(
+        photoId: String,
+        isLiked: Boolean
+    ) {
         setState {
             copy(
                 photoList = photoList.map {
                     if (it.id == photoId) {
-                        it.copy(isLiked = it.isLiked.not())
+                        it.copy(isLiked = isLiked)
                     } else {
                         it
                     }
                 }
             )
+        }
+    }
+
+    private fun observeLikedIds() {
+        viewModelScope.launch {
+            likedRepository.likedIds.collect { ids ->
+                likedIds = ids
+                setState {
+                    copy(
+                        photoList = photoList.map { photo ->
+                            if (photo.id in likeProcessingIds) {
+                                photo
+                            } else {
+                                photo.copy(isLiked = photo.id in ids)
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun List<PhotoInfo>.withLikeState(): List<PhotoInfo> {
+        return map {
+            it.copy(isLiked = it.id in likedIds)
         }
     }
 }

@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.treemiddle.photoexplorer.local.model.LikedPhotoCardEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LikedPhotoDao {
@@ -16,4 +17,7 @@ interface LikedPhotoDao {
 
     @Query("DELETE FROM liked_photo_card WHERE id = :id")
     suspend fun delete(id: String)
+
+    @Query("SELECT id FROM liked_photo_card")
+    fun observeLikedIds(): Flow<List<String>>
 }
