@@ -2,8 +2,10 @@ package com.treemiddle.photoexplorer.feature.photolist
 
 import androidx.lifecycle.viewModelScope
 import com.treemiddle.photoexplorer.base.BaseViewModelV4
+import com.treemiddle.photoexplorer.core.exception.StorageException
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
 import com.treemiddle.photoexplorer.domain.usecase.SelectPhotoUseCase
+import com.treemiddle.photoexplorer.feature.photolist.model.UserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -128,6 +130,15 @@ class PhotoListViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 selectPhotoUseCase(photoCard)
+            }.onFailure {
+                val message = if (it is StorageException) {
+                    UserMessage.STORAGE_FULL
+                } else {
+                    UserMessage.LIKE_FAILED
+                }
+                setEffect {
+                    PhotoListContract.Effect.ShowMessage(message = message)
+                }
             }
         }
     }

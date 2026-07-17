@@ -4,6 +4,7 @@ import com.treemiddle.photoexplorer.base.ViewEvent
 import com.treemiddle.photoexplorer.base.ViewSideEffect
 import com.treemiddle.photoexplorer.base.ViewState
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
+import com.treemiddle.photoexplorer.feature.photolist.model.UserMessage
 
 sealed interface PhotoListContract {
     data class State(
@@ -21,5 +22,7 @@ sealed interface PhotoListContract {
         data class OnPhotoLikeClick(val photoId: String) : Event
     }
 
-    sealed interface Effect : ViewSideEffect
+    sealed interface Effect : ViewSideEffect {
+        data class ShowMessage(val message: UserMessage) : Effect
+    }
 }
