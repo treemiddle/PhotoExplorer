@@ -17,7 +17,7 @@ import com.treemiddle.photoexplorer.core.extension.singleClickable
 
 @Composable
 fun PhotoCard(
-    photo: Any?,
+    image: Any?,
     description: String,
     authorName: String,
     authorProfileImageUrl: String,
@@ -38,7 +38,7 @@ fun PhotoCard(
                 .clip(shape = RoundedCornerShape(size = 12.dp))
         ) {
             RemoteImage(
-                model = photo,
+                model = image,
                 contentDescription = description,
                 modifier = Modifier.fillMaxSize()
             )
@@ -66,7 +66,7 @@ fun PhotoCard(
 @Composable
 private fun P1() {
     PhotoCard(
-        photo = null,
+        image = null,
         description = "설명",
         authorName = "작가 이름",
         authorProfileImageUrl = "",
@@ -83,7 +83,7 @@ private fun P1() {
 @Composable
 private fun P2() {
     PhotoCard(
-        photo = null,
+        image = null,
         description = "설명",
         authorName = "작가 이름 작가 이름 작가 이름 작가 이름 작가 이름 작가 이름 작가 이름 작가 이름",
         authorProfileImageUrl = "",
