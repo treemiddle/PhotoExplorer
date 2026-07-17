@@ -51,6 +51,9 @@ class LikeRepositoryImpl @Inject constructor(
     private suspend fun like(photoInfo: PhotoInfo) {
         val request = photoInfo.toLikedPhotoRequest()
         runCatching {
+            remoteDataSource.trackDownloadApi(id = request.id)
+        }
+        try {
             val byteArray = remoteDataSource.downloadImage(url = request.imageUrl)
             val path = localDataSource.saveImage(
                 photoId = request.id,
@@ -63,8 +66,9 @@ class LikeRepositoryImpl @Inject constructor(
                     likedAt = System.currentTimeMillis()
                 )
             )
-        }.onFailure {
+        } catch (t: Throwable) {
             localDataSource.deleteImage(id = request.id)
+            throw t
         }
     }
 

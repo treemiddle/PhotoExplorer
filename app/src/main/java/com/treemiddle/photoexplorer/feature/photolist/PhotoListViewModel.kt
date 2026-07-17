@@ -6,7 +6,6 @@ import com.treemiddle.photoexplorer.core.exception.StorageException
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
-import com.treemiddle.photoexplorer.domain.usecase.SelectPhotoUseCase
 import com.treemiddle.photoexplorer.feature.photolist.model.UserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -14,7 +13,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PhotoListViewModel @Inject constructor(
-    private val selectPhotoUseCase: SelectPhotoUseCase,
     private val photoRepository: PhotoRepository,
     private val likedRepository: LikeRepository
 ) : BaseViewModelV4<PhotoListContract.Event, PhotoListContract.State, PhotoListContract.Effect>() {
@@ -144,7 +142,7 @@ class PhotoListViewModel @Inject constructor(
         )
         viewModelScope.launch {
             runCatching {
-                selectPhotoUseCase(photoCard)
+                likedRepository.addPhoto(photoInfo = photoCard)
             }.onFailure {
                 updateLiked(
                     photoId = photoId,
