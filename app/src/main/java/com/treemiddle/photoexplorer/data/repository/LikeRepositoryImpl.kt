@@ -38,8 +38,14 @@ class LikeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getLikedPhotoList(offset: Int): List<LikedPhotoCard> {
-        return localDataSource.getLikedPhotoList(offset = offset).toDomain()
+    override suspend fun getLikedPhotoList(
+        limit: Int,
+        offset: Int
+    ): List<LikedPhotoCard> {
+        return localDataSource.getLikedPhotoList(
+            limit = limit,
+            offset = offset
+        ).toDomain()
     }
 
     private suspend fun like(photoInfo: PhotoInfo) {

@@ -40,14 +40,13 @@ class PhotoLocalDataSourceImpl @Inject constructor(
         localImageStore.delete(id = id)
     }
 
-    override suspend fun getLikedPhotoList(offset: Int): List<LikedPhotoData> {
+    override suspend fun getLikedPhotoList(
+        limit: Int,
+        offset: Int
+    ): List<LikedPhotoData> {
         return likedPhotoDao.getPage(
-            limit = PAGE_SIZE,
+            limit = limit,
             offset = offset
         ).toData()
-    }
-
-    companion object {
-        private const val PAGE_SIZE = 20
     }
 }

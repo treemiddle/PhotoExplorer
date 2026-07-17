@@ -43,7 +43,11 @@ private fun Screen(
    Content(
        isLoading = state.isLoading,
        photoList = state.photoList,
-       onBackButtonClick = onNavigateBack
+       isLoadingMore = state.isLoadingMore,
+       onBackButtonClick = onNavigateBack,
+       onLoadMore = {
+           onEventSent(LikedPhotoListContract.Event.LoadMore)
+       }
    )
 }
 
@@ -51,7 +55,9 @@ private fun Screen(
 private fun Content(
     isLoading: Boolean,
     photoList: List<LikedPhotoCard>,
-    onBackButtonClick: () -> Unit
+    isLoadingMore: Boolean,
+    onBackButtonClick: () -> Unit,
+    onLoadMore: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -77,7 +83,9 @@ private fun Content(
 
                 else -> {
                     List(
-                        list = photoList
+                        list = photoList,
+                        isLoadingMore = isLoadingMore,
+                        onLoadMore = onLoadMore
                     )
                 }
             }
@@ -88,17 +96,16 @@ private fun Content(
 @Composable
 private fun List(
     list: List<LikedPhotoCard>,
+    isLoadingMore: Boolean,
+    onLoadMore: () -> Unit,
     modifier: Modifier = Modifier,
-    isLoadingMore: Boolean = false
 ) {
     PhotoList(
         list = list,
         key = {
             it.id
         },
-        onLoadMore = {
-
-        },
+        onLoadMore = onLoadMore,
         modifier = modifier,
         isLoadingMore = isLoadingMore,
         isLoadingMoreError = false

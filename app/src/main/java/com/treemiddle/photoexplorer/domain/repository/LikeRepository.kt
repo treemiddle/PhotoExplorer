@@ -8,5 +8,8 @@ interface LikeRepository {
     val likedIds: Flow<Set<String>>
 
     suspend fun addPhoto(photoInfo: PhotoInfo)
-    suspend fun getLikedPhotoList(offset: Int): List<LikedPhotoCard>
+    suspend fun getLikedPhotoList(
+        limit: Int,
+        offset: Int
+    ): List<LikedPhotoCard>
 }
