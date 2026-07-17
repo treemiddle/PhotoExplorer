@@ -15,7 +15,9 @@ fun LikedPhotoRequest.toData(
         authorProfileImageUrl = authorProfileImageUrl,
         localImagePath = localImagePath,
         remoteImageUrl = imageUrl,
-        likedAt = likedAt
+        likedAt = likedAt,
+        width = width,
+        height = height
     )
 }
 
@@ -33,6 +35,8 @@ fun LikedPhotoData.toDomain(): LikedPhotoCard {
         authorProfileImageUrl = authorProfileImageUrl,
         localImagePath = localImagePath,
         remoteImageUrl = remoteImageUrl,
-        likedAt = likedAt
+        likedAt = likedAt,
+        width = width,
+        height = height
     )
 }

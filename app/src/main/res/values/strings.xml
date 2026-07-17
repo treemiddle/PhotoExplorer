@@ -25,4 +25,5 @@
     <string name="component_stats_views">조회수</string>
     <string name="component_stats_downloads">다운로드</string>
     <string name="component_stats_likes">좋아요</string>
+    <string name="detail_info_error_text">상세 정보를 불러오지 못했어요.</string>
 </resources>

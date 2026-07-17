@@ -1,5 +1,6 @@
 package com.treemiddle.photoexplorer.feature.photodetail
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,11 +26,13 @@ import com.treemiddle.photoexplorer.common.designsystem.Exif
 import com.treemiddle.photoexplorer.common.designsystem.FullScreenError
 import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
 import com.treemiddle.photoexplorer.common.designsystem.LikeButton
+import com.treemiddle.photoexplorer.common.designsystem.LocalImage
 import com.treemiddle.photoexplorer.common.designsystem.Location
 import com.treemiddle.photoexplorer.common.designsystem.RemoteImage
 import com.treemiddle.photoexplorer.common.designsystem.Stats
 import com.treemiddle.photoexplorer.common.designsystem.TagList
 import com.treemiddle.photoexplorer.common.designsystem.TopBar
+import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
 import com.treemiddle.photoexplorer.domain.model.PhotoDetail
 import kotlinx.coroutines.flow.Flow
 
@@ -52,11 +56,17 @@ private fun Screen(
     onEventSent: (event: PhotoDetailContract.Event) -> Unit,
     onNavigateBack: () -> Unit
 ) {
+    val context = LocalContext.current
+
     LaunchedEffect(key1 = true) {
         effectFlow?.collect { effect ->
             when (effect) {
-                else -> {
-
+                is PhotoDetailContract.Effect.ShowMessage -> {
+                    Toast.makeText(
+                        context,
+                        effect.message.value,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
@@ -66,12 +76,13 @@ private fun Screen(
         isError = state.isError,
         isLiked = state.isLiked,
         photoDetail = state.photoDetail,
+        localPhoto = state.localPhoto,
         onBackClick = onNavigateBack,
         onLikeClick = {
 
         },
         onRetryClick = {
-
+            onEventSent(PhotoDetailContract.Event.OnRetryClick)
         }
     )
 }
@@ -82,9 +93,10 @@ private fun Content(
     isError: Boolean,
     isLiked: Boolean,
     photoDetail: PhotoDetail?,
+    localPhoto: LikedPhotoCard?,
     onBackClick: () -> Unit,
     onLikeClick: () -> Unit,
-    onRetryClick: () -> Unit,
+    onRetryClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -113,13 +125,45 @@ private fun Content(
 
                 isError -> {
                     FullScreenError(
-                        message = stringResource(id = R.string.full_screen_error_text),
+                        message = stringResource(R.string.full_screen_error_text),
                         onRetryButtonClick = onRetryClick
                     )
                 }
 
-                photoDetail != null -> {
-                    List(photoDetail = photoDetail)
+                else -> {
+                    List(
+                        authorName = (photoDetail?.authorName ?: localPhoto?.authorName).orEmpty(),
+                        profileImageUrl = (photoDetail?.authorProfileImageUrl
+                            ?: localPhoto?.authorProfileImageUrl).orEmpty(),
+                        description = (photoDetail?.description
+                            ?: localPhoto?.description).orEmpty(),
+                        photoDetail = photoDetail,
+                        image = {
+                            when {
+                                photoDetail != null -> {
+                                    RemoteImage(
+                                        model = photoDetail.fullUrl,
+                                        contentDescription = photoDetail.description,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .aspectRatio(ratio = photoDetail.ratio)
+                                    )
+                                }
+
+                                localPhoto != null -> {
+                                    LocalImage(
+                                        path = localPhoto.localImagePath,
+                                        contentDescription = localPhoto.description,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .aspectRatio(ratio = localPhoto.ratio)
+                                    )
+                                }
+
+                                else -> Unit
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -128,36 +172,49 @@ private fun Content(
 
 @Composable
 private fun List(
-    photoDetail: PhotoDetail,
-    modifier: Modifier = Modifier
+    authorName: String,
+    profileImageUrl: String,
+    description: String,
+    photoDetail: PhotoDetail?,
+    modifier: Modifier = Modifier,
+    image: @Composable () -> Unit,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
-        makeHeader(photoDetail = photoDetail)
-        makeBody(photoDetail = photoDetail)
+        makeHeader(
+            authorName = authorName,
+            profileImageUrl = profileImageUrl,
+            description = description,
+            image = image
+        )
+        if (photoDetail != null) {
+            makeBody(photoDetail = photoDetail)
+        }
     }
 }
 
-private fun LazyListScope.makeHeader(photoDetail: PhotoDetail) {
-    val modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp)
+private fun LazyListScope.makeHeader(
+    authorName: String,
+    profileImageUrl: String,
+    description: String,
+    image: @Composable () -> Unit,
+) {
+    val modifier = Modifier
+        .padding(horizontal = 16.dp)
+        .padding(top = 16.dp)
+
     item {
-        RemoteImage(
-            model = photoDetail.fullUrl,
-            contentDescription = photoDetail.description,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(ratio = photoDetail.ratio)
-        )
+        image()
         AuthorInfo(
-            name = photoDetail.authorName,
-            profileImageUrl = photoDetail.authorProfileImageUrl,
+            name = authorName,
+            profileImageUrl = profileImageUrl,
             profileImageSize = 36.dp,
             modifier = modifier
         )
-        if (photoDetail.description.isNotBlank()) {
+        if (description.isNotBlank()) {
             Text(
-                text = photoDetail.description,
+                text = description,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = modifier
             )
@@ -166,7 +223,9 @@ private fun LazyListScope.makeHeader(photoDetail: PhotoDetail) {
 }
 
 private fun LazyListScope.makeBody(photoDetail: PhotoDetail) {
-    val modifier = Modifier.padding(horizontal = 16.dp).padding(top = 16.dp)
+    val modifier = Modifier
+        .padding(horizontal = 16.dp)
+        .padding(top = 16.dp)
     item {
         HorizontalDivider(modifier = modifier)
         Stats(
@@ -182,7 +241,7 @@ private fun LazyListScope.makeBody(photoDetail: PhotoDetail) {
                 modifier = modifier
             )
         }
-        if (photoDetail.location.displayName.isNullOrBlank().not()) {
+        if (photoDetail.location.displayName.isNotBlank()) {
             HorizontalDivider(modifier = modifier)
             Location(
                 text = photoDetail.location.displayName,
