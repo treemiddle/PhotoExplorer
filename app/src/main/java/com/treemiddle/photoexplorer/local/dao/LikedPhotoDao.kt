@@ -13,4 +13,7 @@ interface LikedPhotoDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM liked_photo_card WHERE id = :id)")
     suspend fun hasId(id: String): Boolean
+
+    @Query("DELETE FROM liked_photo_card WHERE id = :id")
+    suspend fun delete(id: String)
 }

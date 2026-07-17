@@ -26,7 +26,7 @@ class LikeRepositoryImpl @Inject constructor(
         )
         mutex.withLock {
             if (localDataSource.hasId(id = photoInfo.id)) {
-                // NOTE : 좋아요 해제
+                unlike(id = photoInfo.id)
             } else {
                 like(photoInfo = photoInfo)
             }
@@ -51,5 +51,9 @@ class LikeRepositoryImpl @Inject constructor(
         }.onFailure {
             localDataSource.deleteImage(id = request.id)
         }
+    }
+
+    private suspend fun unlike(id: String) {
+        localDataSource.deleteImage(id = id)
     }
 }
