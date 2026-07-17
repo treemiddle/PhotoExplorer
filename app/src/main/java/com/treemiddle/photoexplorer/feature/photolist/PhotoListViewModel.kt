@@ -31,6 +31,10 @@ class PhotoListViewModel @Inject constructor(
             PhotoListContract.Event.RetryLoadMore -> {
                 retryLoadMore()
             }
+
+            is PhotoListContract.Event.OnPhotoLikeClick -> {
+                onPhotoLikeClick(event.photoId)
+            }
         }
     }
 
@@ -112,5 +116,13 @@ class PhotoListViewModel @Inject constructor(
     private fun updatePaging(hasNext: Boolean) {
         page++
         hasNextPage = hasNext
+    }
+
+    private fun onPhotoLikeClick(photoId: String) {
+        viewModelScope.launch {
+            runCatching {
+                photoRepository.downloadPhoto(id = photoId)
+            }
+        }
     }
 }

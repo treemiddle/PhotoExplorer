@@ -77,6 +77,9 @@ private fun Screen(
         onPhotoClick = { photoId ->
             onNavigateToDetail(photoId)
         },
+        onPhotoLikeClick = { photoId ->
+            onEventSent(PhotoListContract.Event.OnPhotoLikeClick(photoId = photoId))
+        },
         onLikeClick = onNavigateToLiked,
         onLoadMore = {
             onEventSent(PhotoListContract.Event.LoadMore)
@@ -97,6 +100,7 @@ private fun Content(
     onRetryClick: () -> Unit,
     onLoadMore: () -> Unit,
     onPhotoClick: (String) -> Unit,
+    onPhotoLikeClick: (String) -> Unit,
     onLikeClick: () -> Unit,
     isLoadingMore: Boolean = false,
     isLoadingMoreError: Boolean = false,
@@ -145,6 +149,7 @@ private fun Content(
                         onLoadMore = onLoadMore,
                         onRetryLoadMore = onRetryLoadMore,
                         onPhotoClick = onPhotoClick,
+                        onPhotoLikeClick = onPhotoLikeClick,
                         isLoadingMore = isLoadingMore,
                         isLoadingMoreError = isLoadingMoreError
                     )
@@ -160,6 +165,7 @@ private fun List(
     modifier: Modifier = Modifier,
     onLoadMore: () -> Unit,
     onPhotoClick: (String) -> Unit,
+    onPhotoLikeClick: (String) -> Unit,
     isLoadingMore: Boolean = false,
     isLoadingMoreError: Boolean = false,
     onRetryLoadMore: () -> Unit = {},
@@ -195,7 +201,7 @@ private fun List(
                     onPhotoClick(it.id)
                 },
                 onLikeClick = {
-
+                    onPhotoLikeClick(it.id)
                 }
             )
         }
@@ -224,7 +230,8 @@ private fun P1() {
         onRetryClick = {},
         onLoadMore = {},
         onPhotoClick = {},
-        onLikeClick = {}
+        onLikeClick = {},
+        onPhotoLikeClick = {}
     )
 }
 
@@ -256,7 +263,8 @@ private fun P2() {
         onRetryClick = {},
         onLoadMore = {},
         onPhotoClick = {},
-        onLikeClick = {}
+        onLikeClick = {},
+        onPhotoLikeClick = {}
     )
 }
 
@@ -273,7 +281,8 @@ private fun P3() {
         onRetryClick = {},
         onLoadMore = {},
         onPhotoClick = {},
-        onLikeClick = {}
+        onLikeClick = {},
+        onPhotoLikeClick = {}
     )
 }
 
@@ -290,6 +299,7 @@ private fun P4() {
         onRetryClick = {},
         onLoadMore = {},
         onPhotoClick = {},
-        onLikeClick = {}
+        onLikeClick = {},
+        onPhotoLikeClick = {}
     )
 }

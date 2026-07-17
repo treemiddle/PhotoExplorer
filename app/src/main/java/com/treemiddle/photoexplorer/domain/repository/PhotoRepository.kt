@@ -4,4 +4,5 @@ import com.treemiddle.photoexplorer.domain.model.PhotoData
 
 interface PhotoRepository {
     suspend fun getPhotoList(page: Int): PhotoData
+    suspend fun downloadPhoto(id: String)
 }

@@ -18,6 +18,7 @@ sealed interface PhotoListContract {
         data object OnRetryClick : Event
         data object LoadMore : Event
         data object RetryLoadMore : Event
+        data class OnPhotoLikeClick(val photoId: String) : Event
     }
 
     sealed interface Effect : ViewSideEffect

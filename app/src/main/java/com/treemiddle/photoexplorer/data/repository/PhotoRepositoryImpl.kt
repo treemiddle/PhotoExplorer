@@ -12,4 +12,8 @@ class PhotoRepositoryImpl @Inject constructor(
     override suspend fun getPhotoList(page: Int): PhotoData {
         return remoteDataSource.getPhotoList(page = page).toDomain()
     }
+
+    override suspend fun downloadPhoto(id: String) {
+        remoteDataSource.downloadPhoto(id = id)
+    }
 }

@@ -21,4 +21,8 @@ class PhotoExplorerRemoteDataSourceImpl @Inject constructor(
             hasNext = LinkHeader.hasNext(header = response.headers()["Link"])
         ).toData()
     }
+
+    override suspend fun downloadPhoto(id: String) {
+        apiService.downloadPhoto(id = id)
+    }
 }
