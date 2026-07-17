@@ -2,6 +2,8 @@ package com.treemiddle.photoexplorer.remote.di
 
 import com.treemiddle.photoexplorer.BuildConfig
 import com.treemiddle.photoexplorer.data.datasource.PhotoExplorerRemoteDataSource
+import com.treemiddle.photoexplorer.remote.ImageDownloader
+import com.treemiddle.photoexplorer.remote.ImageDownloaderImpl
 import com.treemiddle.photoexplorer.remote.PhotoExplorerApiService
 import com.treemiddle.photoexplorer.remote.PhotoExplorerRemoteDataSourceImpl
 import com.treemiddle.photoexplorer.remote.interceptor.PhotoExplorerInterceptor
@@ -25,6 +27,10 @@ internal interface NetworkModule {
     @Binds
     @Singleton
     fun bindsPhotoRemoteDataSource(impl: PhotoExplorerRemoteDataSourceImpl): PhotoExplorerRemoteDataSource
+
+    @Binds
+    @Singleton
+    fun bindsImageDownloader(impl: ImageDownloaderImpl): ImageDownloader
 
     companion object {
         private const val APPLICATION_JSON = "application/json"

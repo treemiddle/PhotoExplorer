@@ -83,6 +83,7 @@ dependencies {
     implementation(libs.retrofit.serialization.converter)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
+    implementation(libs.okhttp.coroutines)
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.androidx.room.runtime)
