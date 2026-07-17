@@ -14,4 +14,15 @@
     <string name="liked_photo_list_topbar_title">좋아요 목록</string>
     <string name="liked_photo_list_empty_text">아직 좋아요한 사진이 없어요.\n마음에 드는 사진의 하트를 눌러보세요.</string>
     <string name="photo_detail_topbar_title">사진 상세</string>
+    <string name="component_tag_title">태그</string>
+    <string name="component_location_title">위치</string>
+    <string name="component_exif_title">촬영 정보(EXIF)</string>
+    <string name="component_exif_label_camera">카메라</string>
+    <string name="component_exif_label_aperture">조리개</string>
+    <string name="component_exif_label_exposure_time">셔터 속도</string>
+    <string name="component_exif_label_focal_length">초점 거리</string>
+    <string name="component_exif_label_iso">ISO</string>
+    <string name="component_stats_views">조회수</string>
+    <string name="component_stats_downloads">다운로드</string>
+    <string name="component_stats_likes">좋아요</string>
 </resources>

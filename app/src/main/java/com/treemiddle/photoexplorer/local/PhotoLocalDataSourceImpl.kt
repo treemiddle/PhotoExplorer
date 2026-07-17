@@ -49,4 +49,8 @@ class PhotoLocalDataSourceImpl @Inject constructor(
             offset = offset
         ).toData()
     }
+
+    override suspend fun getLikedPhoto(id: String): LikedPhotoData? {
+        return likedPhotoDao.get(id = id)?.toData()
+    }
 }

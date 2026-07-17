@@ -1,6 +1,10 @@
 package com.treemiddle.photoexplorer.data.mapper
 
 import com.treemiddle.photoexplorer.data.model.PhotoData
+import com.treemiddle.photoexplorer.data.model.PhotoDetailData
+import com.treemiddle.photoexplorer.domain.model.Exif
+import com.treemiddle.photoexplorer.domain.model.Location
+import com.treemiddle.photoexplorer.domain.model.PhotoDetail
 import com.treemiddle.photoexplorer.domain.model.PhotoData as DomainPhotoData
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo as DomainPhotoInfo
 
@@ -19,5 +23,35 @@ fun PhotoData.toDomain(): DomainPhotoData {
             )
         },
         hasNext = hasNext
+    )
+}
+
+fun PhotoDetailData.toDomain(): PhotoDetail {
+    return PhotoDetail(
+        id = id,
+        description = description,
+        width = width,
+        height = height,
+        fullUrl = fullUrl,
+        regularUrl = regularUrl,
+        authorName = authorName,
+        authorProfileImageUrl = authorProfileImageUrl,
+        views = views,
+        downloads = downloads,
+        likes = likes,
+        exif = Exif(
+            make = exif.make,
+            model = exif.model,
+            exposureTime = exif.exposureTime,
+            aperture = exif.aperture,
+            focalLength = exif.focalLength,
+            iso = exif.iso
+        ),
+        location = Location(
+            name = location.name,
+            city = location.city,
+            country = location.country
+        ),
+        tags = tags
     )
 }

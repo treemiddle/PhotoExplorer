@@ -17,4 +17,5 @@ interface PhotoLocalDataSource {
         limit: Int,
         offset: Int
     ): List<LikedPhotoData>
+    suspend fun getLikedPhoto(id: String): LikedPhotoData?
 }

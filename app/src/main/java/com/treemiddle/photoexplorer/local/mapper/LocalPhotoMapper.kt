@@ -17,14 +17,18 @@ fun LikedPhotoData.toLocal(): LikedPhotoCardEntity {
 
 fun List<LikedPhotoCardEntity>.toData(): List<LikedPhotoData> {
     return map {
-        LikedPhotoData(
-            id = it.id,
-            description = it.description,
-            authorName = it.authorName,
-            authorProfileImageUrl = it.authorProfileImageUrl,
-            localImagePath = it.localImagePath,
-            remoteImageUrl = it.remoteImageUrl,
-            likedAt = it.likedAt
-        )
+        it.toData()
     }
+}
+
+fun LikedPhotoCardEntity.toData(): LikedPhotoData {
+    return LikedPhotoData(
+        id = id,
+        description = description,
+        authorName = authorName,
+        authorProfileImageUrl = authorProfileImageUrl,
+        localImagePath = localImagePath,
+        remoteImageUrl = remoteImageUrl,
+        likedAt = likedAt
+    )
 }

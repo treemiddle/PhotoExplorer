@@ -21,14 +21,18 @@ fun LikedPhotoRequest.toData(
 
 fun List<LikedPhotoData>.toDomain(): List<LikedPhotoCard> {
     return map {
-        LikedPhotoCard(
-            id = it.id,
-            description = it.description,
-            authorName = it.authorName,
-            authorProfileImageUrl = it.authorProfileImageUrl,
-            localImagePath = it.localImagePath,
-            remoteImageUrl = it.remoteImageUrl,
-            likedAt = it.likedAt
-        )
+        it.toDomain()
     }
+}
+
+fun LikedPhotoData.toDomain(): LikedPhotoCard {
+    return LikedPhotoCard(
+        id = id,
+        description = description,
+        authorName = authorName,
+        authorProfileImageUrl = authorProfileImageUrl,
+        localImagePath = localImagePath,
+        remoteImageUrl = remoteImageUrl,
+        likedAt = likedAt
+    )
 }

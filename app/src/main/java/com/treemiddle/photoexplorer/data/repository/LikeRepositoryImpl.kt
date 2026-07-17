@@ -47,6 +47,10 @@ class LikeRepositoryImpl @Inject constructor(
         ).toDomain()
     }
 
+    override suspend fun getLikedPhoto(photoId: String): LikedPhotoCard? {
+        return localDataSource.getLikedPhoto(id = photoId)?.toDomain()
+    }
+
     private suspend fun like(photo: LikedPhotoRequest) {
         runCatching {
             remoteDataSource.trackDownloadApi(id = photo.id)

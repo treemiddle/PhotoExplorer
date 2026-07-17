@@ -2,6 +2,7 @@ package com.treemiddle.photoexplorer.remote
 
 import com.treemiddle.photoexplorer.data.datasource.PhotoExplorerRemoteDataSource
 import com.treemiddle.photoexplorer.data.model.PhotoData
+import com.treemiddle.photoexplorer.data.model.PhotoDetailData
 import com.treemiddle.photoexplorer.remote.mapper.toData
 import com.treemiddle.photoexplorer.remote.model.PhotoResponse
 import retrofit2.HttpException
@@ -29,5 +30,9 @@ class PhotoExplorerRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun downloadImage(url: String): ByteArray {
         return imageDownloader.fetch(url = url)
+    }
+
+    override suspend fun getPhotoDetail(id: String): PhotoDetailData {
+        return apiService.getPhotoDetail(id = id).toData()
     }
 }

@@ -23,4 +23,7 @@ interface LikedPhotoDao {
 
     @Query("SELECT * FROM liked_photo_card ORDER BY likedAt DESC LIMIT :limit OFFSET :offset")
     suspend fun getPage(limit: Int, offset: Int): List<LikedPhotoCardEntity>
+
+    @Query("SELECT * FROM liked_photo_card WHERE id = :id")
+    suspend fun get(id: String): LikedPhotoCardEntity?
 }

@@ -12,4 +12,5 @@ interface LikeRepository {
         limit: Int,
         offset: Int
     ): List<LikedPhotoCard>
+    suspend fun getLikedPhoto(photoId: String): LikedPhotoCard?
 }
