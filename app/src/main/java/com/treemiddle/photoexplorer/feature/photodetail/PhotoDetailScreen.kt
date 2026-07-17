@@ -157,7 +157,16 @@ private fun Content(
                                         contentDescription = photoDetail.description,
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .aspectRatio(ratio = photoDetail.ratio)
+                                            .aspectRatio(ratio = photoDetail.ratio),
+                                        placeholder = localPhoto?.let { local ->
+                                            {
+                                                LocalImage(
+                                                    path = local.localImagePath,
+                                                    contentDescription = local.description,
+                                                    modifier = Modifier.matchParentSize()
+                                                )
+                                            }
+                                        }
                                     )
                                 }
 

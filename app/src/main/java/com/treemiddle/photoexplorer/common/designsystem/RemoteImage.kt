@@ -2,8 +2,8 @@ package com.treemiddle.photoexplorer.common.designsystem
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BrokenImage
@@ -27,6 +27,7 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import coil3.size.Size
 import com.treemiddle.photoexplorer.R
 
 @Composable
@@ -40,7 +41,8 @@ fun RemoteImage(
     },
     error: (@Composable BoxScope.() -> Unit)? = {
         DefaultImageError()
-    }
+    },
+    placeholder: (@Composable BoxScope.() -> Unit)? = null
 ) {
     if (LocalInspectionMode.current) {
         Image(
@@ -53,20 +55,31 @@ fun RemoteImage(
     }
 
     val context = LocalPlatformContext.current
-    val request = remember(
-        key1 = model,
-        key2 = context
-    ) {
-        ImageRequest.Builder(context = context)
-            .data(data = model)
-            .crossfade(enable = true)
-            .build()
-    }
     var state by remember(key1 = model) {
         mutableStateOf<AsyncImagePainter.State>(AsyncImagePainter.State.Empty)
     }
 
-    Box(modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant)) {
+    BoxWithConstraints(modifier = modifier.background(color = MaterialTheme.colorScheme.surfaceVariant)) {
+        if (constraints.isZero) {
+            return@BoxWithConstraints
+        }
+        val request = remember(
+            key1 = model,
+            key2 = context,
+            key3 = constraints
+        ) {
+            ImageRequest.Builder(context = context)
+                .data(data = model)
+                .size(
+                    size = Size(
+                        width = constraints.maxWidth,
+                        height = constraints.maxHeight
+                    )
+                )
+                .crossfade(enable = true)
+                .build()
+        }
+        placeholder?.invoke(this)
         AsyncImage(
             model = request,
             contentDescription = contentDescription,
@@ -76,16 +89,18 @@ fun RemoteImage(
                 state = it
             }
         )
-        when (state) {
-            is AsyncImagePainter.State.Loading -> {
-                loading?.invoke(this)
-            }
+        if (placeholder == null) {
+            when (state) {
+                is AsyncImagePainter.State.Loading -> {
+                    loading?.invoke(this)
+                }
 
-            is AsyncImagePainter.State.Error -> {
-                error?.invoke(this)
-            }
+                is AsyncImagePainter.State.Error -> {
+                    error?.invoke(this)
+                }
 
-            else -> Unit
+                else -> Unit
+            }
         }
     }
 }
