@@ -61,6 +61,9 @@ class LikedPhotoListViewModel @Inject constructor(
                 setState {
                     copy(isLoading = false)
                 }
+                setEffect {
+                    LikedPhotoListContract.Effect.ShowMessage(message = UserMessage.LIKED_LIST_LOAD_FAILED)
+                }
             }
         }
     }

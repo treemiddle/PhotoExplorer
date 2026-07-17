@@ -65,7 +65,7 @@ private fun Screen(
                     Toast.makeText(
                         context,
                         effect.message.value,
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_LONG
                     ).show()
                 }
             }
