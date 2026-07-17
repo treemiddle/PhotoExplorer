@@ -1,11 +1,14 @@
 package com.treemiddle.photoexplorer.feature.likedphotolist
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -17,6 +20,7 @@ import com.treemiddle.photoexplorer.common.designsystem.TopBar
 import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
 import com.treemiddle.photoexplorer.feature.common.PhotoList
+import com.treemiddle.photoexplorer.feature.photolist.PhotoListContract
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 
@@ -43,6 +47,22 @@ private fun Screen(
     onNavigateBack: () -> Unit,
     onNavigateToDetail: (String) -> Unit
 ) {
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = true) {
+        effectFlow?.collect { effect ->
+            when (effect) {
+                is LikedPhotoListContract.Effect.ShowMessage -> {
+                    Toast.makeText(
+                        context,
+                        effect.message.value,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
    Content(
        isLoading = state.isLoading,
        photoList = state.photoList,
@@ -51,7 +71,10 @@ private fun Screen(
        onLoadMore = {
            onEventSent(LikedPhotoListContract.Event.LoadMore)
        },
-       onPhotoClick = onNavigateToDetail
+       onPhotoClick = onNavigateToDetail,
+       onUnlikeClick = { photoId ->
+           onEventSent(LikedPhotoListContract.Event.UnLikeClick(photoId = photoId))
+       }
    )
 }
 
@@ -62,7 +85,8 @@ private fun Content(
     isLoadingMore: Boolean,
     onBackButtonClick: () -> Unit,
     onLoadMore: () -> Unit,
-    onPhotoClick: (String) -> Unit
+    onPhotoClick: (String) -> Unit,
+    onUnlikeClick: (String) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -91,7 +115,8 @@ private fun Content(
                         list = photoList,
                         isLoadingMore = isLoadingMore,
                         onLoadMore = onLoadMore,
-                        onPhotoClick = onPhotoClick
+                        onPhotoClick = onPhotoClick,
+                        onUnlikeClick = onUnlikeClick
                     )
                 }
             }
@@ -105,7 +130,8 @@ private fun List(
     isLoadingMore: Boolean,
     onLoadMore: () -> Unit,
     onPhotoClick: (String) -> Unit,
-    modifier: Modifier = Modifier,
+    onUnlikeClick: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     PhotoList(
         list = list,
@@ -127,7 +153,7 @@ private fun List(
                 onPhotoClick(it.id)
             },
             onLikeClick = {
-
+                onUnlikeClick(it.id)
             }
         )
     }

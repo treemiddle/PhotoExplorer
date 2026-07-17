@@ -28,3 +28,13 @@ fun PhotoInfo.toLikedPhotoRequest(): LikedPhotoRequest {
         imageUrl = regularUrl
     )
 }
+
+fun LikedPhotoCard.toLikedPhotoRequest(): LikedPhotoRequest {
+    return LikedPhotoRequest(
+        id = id,
+        description = description,
+        authorName = authorName,
+        authorProfileImageUrl = authorProfileImageUrl,
+        imageUrl = localImagePath
+    )
+}

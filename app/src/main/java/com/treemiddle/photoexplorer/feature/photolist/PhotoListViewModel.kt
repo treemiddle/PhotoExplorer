@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.treemiddle.photoexplorer.base.BaseViewModelV4
 import com.treemiddle.photoexplorer.core.exception.StorageException
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
+import com.treemiddle.photoexplorer.domain.model.toLikedPhotoRequest
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
 import com.treemiddle.photoexplorer.feature.photolist.model.UserMessage
@@ -142,7 +143,7 @@ class PhotoListViewModel @Inject constructor(
         )
         viewModelScope.launch {
             runCatching {
-                likedRepository.addPhoto(photoInfo = photoCard)
+                likedRepository.updatePhoto(photo = photoCard.toLikedPhotoRequest())
             }.onFailure {
                 updateLiked(
                     photoId = photoId,

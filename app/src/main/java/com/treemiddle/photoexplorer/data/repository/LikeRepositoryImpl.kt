@@ -5,8 +5,7 @@ import com.treemiddle.photoexplorer.data.datasource.PhotoLocalDataSource
 import com.treemiddle.photoexplorer.data.mapper.toData
 import com.treemiddle.photoexplorer.data.mapper.toDomain
 import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
-import com.treemiddle.photoexplorer.domain.model.PhotoInfo
-import com.treemiddle.photoexplorer.domain.model.toLikedPhotoRequest
+import com.treemiddle.photoexplorer.domain.model.LikedPhotoRequest
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
@@ -22,18 +21,18 @@ class LikeRepositoryImpl @Inject constructor(
 
     private val likeIdHashMap = ConcurrentHashMap<String, Mutex>()
 
-    override suspend fun addPhoto(photoInfo: PhotoInfo) {
+    override suspend fun updatePhoto(photo: LikedPhotoRequest) {
         val mutex = likeIdHashMap.getOrPut(
-            key = photoInfo.id,
+            key = photo.id,
             defaultValue = {
                 Mutex()
             }
         )
         mutex.withLock {
-            if (localDataSource.hasId(id = photoInfo.id)) {
-                unlike(id = photoInfo.id)
+            if (localDataSource.hasId(id = photo.id)) {
+                unlike(id = photo.id)
             } else {
-                like(photoInfo = photoInfo)
+                like(photo = photo)
             }
         }
     }
@@ -48,26 +47,25 @@ class LikeRepositoryImpl @Inject constructor(
         ).toDomain()
     }
 
-    private suspend fun like(photoInfo: PhotoInfo) {
-        val request = photoInfo.toLikedPhotoRequest()
+    private suspend fun like(photo: LikedPhotoRequest) {
         runCatching {
-            remoteDataSource.trackDownloadApi(id = request.id)
+            remoteDataSource.trackDownloadApi(id = photo.id)
         }
         try {
-            val byteArray = remoteDataSource.downloadImage(url = request.imageUrl)
+            val byteArray = remoteDataSource.downloadImage(url = photo.imageUrl)
             val path = localDataSource.saveImage(
-                photoId = request.id,
+                photoId = photo.id,
                 byteArray = byteArray
             )
 
             localDataSource.addPhotoCard(
-                request.toData(
+                photo.toData(
                     localImagePath = path,
                     likedAt = System.currentTimeMillis()
                 )
             )
         } catch (t: Throwable) {
-            localDataSource.deleteImage(id = request.id)
+            localDataSource.deleteImage(id = photo.id)
             throw t
         }
     }
