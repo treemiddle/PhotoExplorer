@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.treemiddle.photoexplorer.R
@@ -18,9 +19,7 @@ import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
 import com.treemiddle.photoexplorer.common.designsystem.PhotoCard
 import com.treemiddle.photoexplorer.common.designsystem.TopBar
 import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
-import com.treemiddle.photoexplorer.domain.model.PhotoInfo
 import com.treemiddle.photoexplorer.feature.common.PhotoList
-import com.treemiddle.photoexplorer.feature.photolist.PhotoListContract
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 
@@ -63,19 +62,19 @@ private fun Screen(
         }
     }
 
-   Content(
-       isLoading = state.isLoading,
-       photoList = state.photoList,
-       isLoadingMore = state.isLoadingMore,
-       onBackButtonClick = onNavigateBack,
-       onLoadMore = {
-           onEventSent(LikedPhotoListContract.Event.LoadMore)
-       },
-       onPhotoClick = onNavigateToDetail,
-       onUnlikeClick = { photoId ->
-           onEventSent(LikedPhotoListContract.Event.UnLikeClick(photoId = photoId))
-       }
-   )
+    Content(
+        isLoading = state.isLoading,
+        photoList = state.photoList,
+        isLoadingMore = state.isLoadingMore,
+        onBackButtonClick = onNavigateBack,
+        onLoadMore = {
+            onEventSent(LikedPhotoListContract.Event.LoadMore)
+        },
+        onPhotoClick = onNavigateToDetail,
+        onUnlikeClick = { photoId ->
+            onEventSent(LikedPhotoListContract.Event.UnLikeClick(photoId = photoId))
+        }
+    )
 }
 
 @Composable
@@ -157,4 +156,99 @@ private fun List(
             }
         )
     }
+}
+
+@Preview(
+    showBackground = true,
+    name = "전체 로딩 화면"
+)
+@Composable
+private fun P1() {
+    Content(
+        isLoading = true,
+        photoList = emptyList(),
+        isLoadingMore = false,
+        onBackButtonClick = {},
+        onLoadMore = {},
+        onPhotoClick = {},
+        onUnlikeClick = {}
+    )
+}
+
+@Preview(
+    showBackground = true,
+    name = "좋아요된 사진이 없는 화면"
+)
+@Composable
+private fun P2() {
+    Content(
+        isLoading = false,
+        photoList = emptyList(),
+        isLoadingMore = false,
+        onBackButtonClick = {},
+        onLoadMore = {},
+        onPhotoClick = {},
+        onUnlikeClick = {}
+    )
+}
+
+@Preview(
+    showBackground = true,
+    name = "좋아요된 사진이 없는 화면"
+)
+@Composable
+private fun P3() {
+    Content(
+        isLoading = false,
+        photoList = listOf(
+            LikedPhotoCard(
+                id = "1",
+                description = "설명",
+                authorName = "작가 이름"
+            ),
+            LikedPhotoCard(
+                id = "2",
+                description = "설명",
+                authorName = "작가 이름 작가 이름"
+            ),
+        ),
+        isLoadingMore = false,
+        onBackButtonClick = {},
+        onLoadMore = {},
+        onPhotoClick = {},
+        onUnlikeClick = {}
+    )
+}
+
+@Preview(
+    showBackground = true,
+    name = "좋아요한 사진 목록을 더 불러오는 화면"
+)
+@Composable
+private fun P4() {
+    Content(
+        isLoading = false,
+        photoList = listOf(
+            LikedPhotoCard(
+                id = "1",
+                description = "설명",
+                authorName = "작가 이름"
+            ),
+            LikedPhotoCard(
+                id = "2",
+                description = "설명",
+                authorName = "작가 이름 작가 이름"
+            ),
+            LikedPhotoCard(
+                id = "3",
+                description = "설명",
+                authorName = "작가 이름 작가 이름"
+            ),
+        ),
+        isLoadingMore = true,
+        onBackButtonClick = {},
+        onLoadMore = {},
+        onPhotoClick = {},
+        onUnlikeClick = {}
+    )
 }
