@@ -14,7 +14,7 @@ interface PhotoExplorerApiService {
     ): Response<List<PhotoInfo>>
 
     @GET(PHOTO_DOWNLOAD)
-    suspend fun downloadPhoto(@Path("id") id: String)
+    suspend fun trackDownloadApi(@Path("id") id: String)
 
     companion object {
         private const val GET_PHOTOS = "photos"

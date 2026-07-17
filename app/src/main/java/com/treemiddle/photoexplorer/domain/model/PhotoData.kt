@@ -13,5 +13,6 @@ data class PhotoInfo(
     val thumbUrl: String = "",
     val regularUrl: String = "",
     val authorName: String = "",
-    val authorProfileImageUrl: String = ""
+    val authorProfileImageUrl: String = "",
+    val isLiked: Boolean = false
 )

@@ -1,0 +1,34 @@
+package com.treemiddle.photoexplorer.local
+
+import com.treemiddle.photoexplorer.data.datasource.PhotoLocalDataSource
+import com.treemiddle.photoexplorer.data.model.LikedPhotoData
+import com.treemiddle.photoexplorer.local.dao.LikedPhotoDao
+import com.treemiddle.photoexplorer.local.mapper.toLocal
+import javax.inject.Inject
+
+class PhotoLocalDataSourceImpl @Inject constructor(
+    private val likedPhotoDao: LikedPhotoDao,
+    private val localImageStore: LocalImageStore
+) : PhotoLocalDataSource {
+    override suspend fun addPhotoCard(photoCard: LikedPhotoData) {
+        likedPhotoDao.add(photoCard.toLocal())
+    }
+
+    override suspend fun hasId(id: String): Boolean {
+        return likedPhotoDao.hasId(id = id)
+    }
+
+    override suspend fun saveImage(
+        photoId: String,
+        byteArray: ByteArray
+    ): String {
+        return localImageStore.save(
+            id = photoId,
+            byteArray = byteArray
+        )
+    }
+
+    override suspend fun deleteImage(id: String) {
+        localImageStore.delete(id = id)
+    }
+}

@@ -1,6 +1,8 @@
 package com.treemiddle.photoexplorer.data.di
 
+import com.treemiddle.photoexplorer.data.repository.LikeRepositoryImpl
 import com.treemiddle.photoexplorer.data.repository.PhotoRepositoryImpl
+import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
 import dagger.Binds
 import dagger.Module
@@ -14,4 +16,8 @@ internal interface RepositoryModule {
     @Binds
     @Singleton
     fun bindsPhotoRepository(impl: PhotoRepositoryImpl): PhotoRepository
+
+    @Binds
+    @Singleton
+    fun bindsLikeRepository(impl: LikeRepositoryImpl): LikeRepository
 }

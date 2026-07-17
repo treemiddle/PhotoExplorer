@@ -3,12 +3,14 @@ package com.treemiddle.photoexplorer.feature.photolist
 import androidx.lifecycle.viewModelScope
 import com.treemiddle.photoexplorer.base.BaseViewModelV4
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
+import com.treemiddle.photoexplorer.domain.usecase.SelectPhotoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PhotoListViewModel @Inject constructor(
+    private val selectPhotoUseCase: SelectPhotoUseCase,
     private val photoRepository: PhotoRepository
 ) : BaseViewModelV4<PhotoListContract.Event, PhotoListContract.State, PhotoListContract.Effect>() {
     private var hasNextPage = false
@@ -119,10 +121,28 @@ class PhotoListViewModel @Inject constructor(
     }
 
     private fun onPhotoLikeClick(photoId: String) {
+        val photoCard = viewState.value.photoList.find {
+            it.id == photoId
+        } ?: return
+        updateLiked(photoId = photoCard.id)
         viewModelScope.launch {
             runCatching {
-                photoRepository.downloadPhoto(id = photoId)
+                selectPhotoUseCase(photoCard)
             }
+        }
+    }
+
+    private fun updateLiked(photoId: String) {
+        setState {
+            copy(
+                photoList = photoList.map {
+                    if (it.id == photoId) {
+                        it.copy(isLiked = it.isLiked.not())
+                    } else {
+                        it
+                    }
+                }
+            )
         }
     }
 }

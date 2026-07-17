@@ -8,7 +8,8 @@ import retrofit2.HttpException
 import javax.inject.Inject
 
 class PhotoExplorerRemoteDataSourceImpl @Inject constructor(
-    private val apiService: PhotoExplorerApiService
+    private val apiService: PhotoExplorerApiService,
+    private val imageDownloader: ImageDownloader
 ) : PhotoExplorerRemoteDataSource {
     override suspend fun getPhotoList(page: Int): PhotoData {
         val response = apiService.getPhotoList(page = page)
@@ -22,7 +23,11 @@ class PhotoExplorerRemoteDataSourceImpl @Inject constructor(
         ).toData()
     }
 
-    override suspend fun downloadPhoto(id: String) {
-        apiService.downloadPhoto(id = id)
+    override suspend fun trackDownloadApi(id: String) {
+        apiService.trackDownloadApi(id = id)
+    }
+
+    override suspend fun downloadImage(url: String): ByteArray {
+        return imageDownloader.fetch(url = url)
     }
 }

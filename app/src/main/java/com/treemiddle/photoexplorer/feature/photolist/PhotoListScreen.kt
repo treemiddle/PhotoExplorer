@@ -196,7 +196,7 @@ private fun List(
                 description = it.description,
                 authorName = it.authorName,
                 authorProfileImageUrl = it.authorProfileImageUrl,
-                isLiked = false,
+                isLiked = it.isLiked,
                 onClick = {
                     onPhotoClick(it.id)
                 },
