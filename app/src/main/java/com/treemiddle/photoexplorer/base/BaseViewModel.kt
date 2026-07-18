@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-abstract class BaseViewModelV4<Event : ViewEvent, UiState : ViewState, Effect : ViewSideEffect> :
+abstract class BaseViewModel<Event : ViewEvent, UiState : ViewState, Effect : ViewSideEffect> :
     ViewModel() {
     val viewState: StateFlow<UiState> get() = _viewState
     val effect get() = _effect.receiveAsFlow()
@@ -29,7 +29,7 @@ abstract class BaseViewModelV4<Event : ViewEvent, UiState : ViewState, Effect : 
 
     protected fun setState(reducer: UiState.() -> UiState) {
         _viewState.update {
-            viewState.value.reducer()
+            it.reducer()
         }
     }
 

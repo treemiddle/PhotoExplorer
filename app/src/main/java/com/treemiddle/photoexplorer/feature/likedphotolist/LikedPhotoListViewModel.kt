@@ -1,7 +1,7 @@
 package com.treemiddle.photoexplorer.feature.likedphotolist
 
 import androidx.lifecycle.viewModelScope
-import com.treemiddle.photoexplorer.base.BaseViewModelV4
+import com.treemiddle.photoexplorer.base.BaseViewModel
 import com.treemiddle.photoexplorer.domain.repository.LayoutRepository
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.feature.common.UserMessage
@@ -13,7 +13,7 @@ import javax.inject.Inject
 class LikedPhotoListViewModel @Inject constructor(
     private val likeRepository: LikeRepository,
     private val layoutRepository: LayoutRepository
-) : BaseViewModelV4<LikedPhotoListContract.Event, LikedPhotoListContract.State, LikedPhotoListContract.Effect>() {
+) : BaseViewModel<LikedPhotoListContract.Event, LikedPhotoListContract.State, LikedPhotoListContract.Effect>() {
     private var hasNextPage = false
 
     override fun setInitialState(): LikedPhotoListContract.State {

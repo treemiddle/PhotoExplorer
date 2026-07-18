@@ -10,7 +10,9 @@ import com.treemiddle.photoexplorer.remote.model.PhotoResponse
 
 fun PhotoResponse.toData(): PhotoData {
     return PhotoData(
-        list = list.map {
+        list = list.filter {
+            it.id.isNotBlank()
+        }.map {
             PhotoInfo(
                 id = it.id,
                 description = it.description.ifBlank {

@@ -2,7 +2,7 @@ package com.treemiddle.photoexplorer.feature.photodetail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.treemiddle.photoexplorer.base.BaseViewModelV4
+import com.treemiddle.photoexplorer.base.BaseViewModel
 import com.treemiddle.photoexplorer.core.exception.StorageException
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
@@ -17,7 +17,7 @@ class PhotoDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val photoRepository: PhotoRepository,
     private val likedRepository: LikeRepository
-) : BaseViewModelV4<PhotoDetailContract.Event, PhotoDetailContract.State, PhotoDetailContract.Effect>() {
+) : BaseViewModel<PhotoDetailContract.Event, PhotoDetailContract.State, PhotoDetailContract.Effect>() {
     private val photoId = savedStateHandle[Route.PHOTO_ID] ?: ""
 
     private var likeProcessing = false

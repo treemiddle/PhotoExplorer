@@ -1,7 +1,7 @@
 package com.treemiddle.photoexplorer.feature.photolist
 
 import androidx.lifecycle.viewModelScope
-import com.treemiddle.photoexplorer.base.BaseViewModelV4
+import com.treemiddle.photoexplorer.base.BaseViewModel
 import com.treemiddle.photoexplorer.core.exception.StorageException
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
 import com.treemiddle.photoexplorer.domain.model.toLikedPhotoRequest
@@ -18,12 +18,12 @@ class PhotoListViewModel @Inject constructor(
     private val photoRepository: PhotoRepository,
     private val likedRepository: LikeRepository,
     private val layoutRepository: LayoutRepository
-) : BaseViewModelV4<PhotoListContract.Event, PhotoListContract.State, PhotoListContract.Effect>() {
+) : BaseViewModel<PhotoListContract.Event, PhotoListContract.State, PhotoListContract.Effect>() {
     private var hasNextPage = false
     private var page = 1
 
-    private val inFlightLikeRequestCounts = mutableMapOf<String, Int>()
-    private var likedIds: Set<String> = emptySet()
+    private val pendingLikes = mutableMapOf<String, PendingLike>()
+    private var databaseLikedIds: Set<String> = emptySet()
 
     override fun setInitialState(): PhotoListContract.State {
         return PhotoListContract.State()
@@ -74,7 +74,9 @@ class PhotoListViewModel @Inject constructor(
                     copy(
                         isLoading = false,
                         isError = false,
-                        photoList = it.list.withLikeState()
+                        photoList = it.list.distinctBy { photo ->
+                            photo.id
+                        }.withLikeState()
                     )
                 }
                 updatePaging(hasNext = it.hasNext)
@@ -108,11 +110,9 @@ class PhotoListViewModel @Inject constructor(
                     copy(
                         isLoadingMore = false,
                         isLoadingMoreError = false,
-                        photoList = (photoList + it.list)
-                            .distinctBy { photo ->
-                                photo.id
-                            }
-                            .withLikeState()
+                        photoList = (photoList + it.list).distinctBy { photo ->
+                            photo.id
+                        }.withLikeState()
                     )
                 }
                 updatePaging(hasNext = it.hasNext)
@@ -144,11 +144,11 @@ class PhotoListViewModel @Inject constructor(
             it.id == photoId
         } ?: return
 
-        inFlightLikeRequestCounts[photoId] = (inFlightLikeRequestCounts[photoId] ?: 0) + 1
-        updateLiked(
-            photoId = photoCard.id,
+        pendingLikes[photoId] = PendingLike(
+            count = (pendingLikes[photoId]?.count ?: 0) + 1,
             isLiked = photoCard.isLiked.not()
         )
+        updateLiked()
         viewModelScope.launch {
             val result = runCatching {
                 if (photoCard.isLiked) {
@@ -174,63 +174,46 @@ class PhotoListViewModel @Inject constructor(
                     PhotoListContract.Effect.ShowMessage(message = message)
                 }
             }
-            finishLikeWork(
+            completeLikeRequest(
                 photoId = photoId,
+                isLiked = photoCard.isLiked.not(),
                 isFailed = result.isFailure
             )
         }
     }
 
-    private fun finishLikeWork(
+    private fun completeLikeRequest(
         photoId: String,
+        isLiked: Boolean,
         isFailed: Boolean
     ) {
-        val remaining = (inFlightLikeRequestCounts[photoId] ?: 1) - 1
-        if (remaining > 0) {
-            inFlightLikeRequestCounts[photoId] = remaining
+        val pending = pendingLikes[photoId] ?: return
+        if (pending.count > 1) {
+            pendingLikes[photoId] = pending.copy(count = pending.count - 1)
             return
         }
-        inFlightLikeRequestCounts.remove(photoId)
-        if (isFailed) {
-            updateLiked(
-                photoId = photoId,
-                isLiked = photoId in likedIds
-            )
+        pendingLikes.remove(key = photoId)
+        if (isFailed.not()) {
+            databaseLikedIds = if (isLiked) {
+                databaseLikedIds + photoId
+            } else {
+                databaseLikedIds - photoId
+            }
         }
+        updateLiked()
     }
 
-    private fun updateLiked(
-        photoId: String,
-        isLiked: Boolean
-    ) {
+    private fun updateLiked() {
         setState {
-            copy(
-                photoList = photoList.map {
-                    if (it.id == photoId) {
-                        it.copy(isLiked = isLiked)
-                    } else {
-                        it
-                    }
-                }
-            )
+            copy(photoList = photoList.withLikeState())
         }
     }
 
     private fun observeLikedIds() {
         viewModelScope.launch {
             likedRepository.likedIds.collect { ids ->
-                likedIds = ids
-                setState {
-                    copy(
-                        photoList = photoList.map { photo ->
-                            if (photo.id in inFlightLikeRequestCounts) {
-                                photo
-                            } else {
-                                photo.copy(isLiked = photo.id in ids)
-                            }
-                        }
-                    )
-                }
+                databaseLikedIds = ids
+                updateLiked()
             }
         }
     }
@@ -253,11 +236,12 @@ class PhotoListViewModel @Inject constructor(
 
     private fun List<PhotoInfo>.withLikeState(): List<PhotoInfo> {
         return map {
-            if (it.id in inFlightLikeRequestCounts) {
-                it
-            } else {
-                it.copy(isLiked = it.id in likedIds)
-            }
+            it.copy(isLiked = pendingLikes[it.id]?.isLiked ?: (it.id in databaseLikedIds))
         }
     }
+
+    private data class PendingLike(
+        val count: Int,
+        val isLiked: Boolean
+    )
 }

@@ -7,6 +7,7 @@ import com.treemiddle.photoexplorer.data.mapper.toDomain
 import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
 import com.treemiddle.photoexplorer.domain.model.LikedPhotoRequest
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
@@ -59,6 +60,10 @@ class LikeRepositoryImpl @Inject constructor(
     private suspend fun savePhoto(photo: LikedPhotoRequest) {
         runCatching {
             remoteDataSource.trackDownloadApi(id = photo.id)
+        }.onFailure {
+            if (it is CancellationException) {
+                throw it
+            }
         }
         try {
             val byteArray = remoteDataSource.downloadImage(url = photo.imageUrl)
