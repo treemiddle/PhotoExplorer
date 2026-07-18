@@ -14,14 +14,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.treemiddle.photoexplorer.R
-import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
-import com.treemiddle.photoexplorer.common.designsystem.FullScreenView
-import com.treemiddle.photoexplorer.common.designsystem.PhotoCard
-import com.treemiddle.photoexplorer.common.designsystem.TopBar
-import com.treemiddle.photoexplorer.domain.model.Layout
+import com.treemiddle.photoexplorer.core.designsystem.FullScreenLoading
+import com.treemiddle.photoexplorer.core.designsystem.FullScreenView
+import com.treemiddle.photoexplorer.core.designsystem.PhotoCard
+import com.treemiddle.photoexplorer.core.designsystem.TopBar
+import com.treemiddle.photoexplorer.core.model.PhotoLayout
+import com.treemiddle.photoexplorer.core.ui.toPhotoLayout
 import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
-import com.treemiddle.photoexplorer.feature.common.LayoutToggle
-import com.treemiddle.photoexplorer.feature.common.PhotoList
+import com.treemiddle.photoexplorer.core.designsystem.LayoutToggle
+import com.treemiddle.photoexplorer.core.designsystem.PhotoList
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 
@@ -68,7 +69,7 @@ private fun Screen(
         isLoading = state.isLoading,
         photoList = state.photoList,
         isLoadingMore = state.isLoadingMore,
-        layout = state.layout,
+        layout = state.layout.toPhotoLayout(),
         onBackButtonClick = onNavigateBack,
         onLoadMore = {
             onEventSent(LikedPhotoListContract.Event.LoadMore)
@@ -88,7 +89,7 @@ private fun Content(
     isLoading: Boolean,
     photoList: List<LikedPhotoCard>,
     isLoadingMore: Boolean,
-    layout: Layout,
+    layout: PhotoLayout,
     onBackButtonClick: () -> Unit,
     onLoadMore: () -> Unit,
     onPhotoClick: (String) -> Unit,
@@ -142,7 +143,7 @@ private fun Content(
 private fun List(
     list: List<LikedPhotoCard>,
     isLoadingMore: Boolean,
-    layout: Layout,
+    layout: PhotoLayout,
     onLoadMore: () -> Unit,
     onPhotoClick: (String) -> Unit,
     onUnlikeClick: (String) -> Unit,
@@ -186,7 +187,7 @@ private fun P1() {
         isLoading = true,
         photoList = emptyList(),
         isLoadingMore = false,
-        layout = Layout.TWO_GRID,
+        layout = PhotoLayout.TWO_GRID,
         onBackButtonClick = {},
         onLoadMore = {},
         onPhotoClick = {},
@@ -205,7 +206,7 @@ private fun P2() {
         isLoading = false,
         photoList = emptyList(),
         isLoadingMore = false,
-        layout = Layout.ONE_GRID,
+        layout = PhotoLayout.ONE_GRID,
         onBackButtonClick = {},
         onLoadMore = {},
         onPhotoClick = {},
@@ -235,7 +236,7 @@ private fun P3() {
             ),
         ),
         isLoadingMore = false,
-        layout = Layout.TWO_GRID,
+        layout = PhotoLayout.TWO_GRID,
         onBackButtonClick = {},
         onLoadMore = {},
         onPhotoClick = {},
@@ -270,7 +271,7 @@ private fun P4() {
             ),
         ),
         isLoadingMore = true,
-        layout = Layout.TWO_GRID,
+        layout = PhotoLayout.TWO_GRID,
         onBackButtonClick = {},
         onLoadMore = {},
         onPhotoClick = {},

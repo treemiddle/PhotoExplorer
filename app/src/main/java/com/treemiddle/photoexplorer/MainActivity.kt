@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.treemiddle.photoexplorer.common.theme.PhotoExplorerTheme
+import com.treemiddle.photoexplorer.core.designsystem.theme.PhotoExplorerTheme
 import com.treemiddle.photoexplorer.navigation.NavHost
 import dagger.hilt.android.AndroidEntryPoint
 

@@ -1,14 +1,14 @@
 package com.treemiddle.photoexplorer.feature.photolist
 
 import androidx.lifecycle.viewModelScope
-import com.treemiddle.photoexplorer.base.BaseViewModel
-import com.treemiddle.photoexplorer.core.exception.StorageException
+import com.treemiddle.photoexplorer.core.ui.BaseViewModel
+import com.treemiddle.photoexplorer.core.common.StorageException
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
 import com.treemiddle.photoexplorer.domain.model.toLikedPhotoRequest
 import com.treemiddle.photoexplorer.domain.repository.LayoutRepository
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
-import com.treemiddle.photoexplorer.feature.common.UserMessage
+import com.treemiddle.photoexplorer.core.ui.UserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

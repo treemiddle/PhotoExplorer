@@ -1,11 +1,11 @@
 package com.treemiddle.photoexplorer.feature.photolist
 
-import com.treemiddle.photoexplorer.base.ViewEvent
-import com.treemiddle.photoexplorer.base.ViewSideEffect
-import com.treemiddle.photoexplorer.base.ViewState
+import com.treemiddle.photoexplorer.core.ui.ViewEvent
+import com.treemiddle.photoexplorer.core.ui.ViewSideEffect
+import com.treemiddle.photoexplorer.core.ui.ViewState
 import com.treemiddle.photoexplorer.domain.model.Layout
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
-import com.treemiddle.photoexplorer.feature.common.UserMessage
+import com.treemiddle.photoexplorer.core.ui.UserMessage
 
 sealed interface PhotoListContract {
     data class State(

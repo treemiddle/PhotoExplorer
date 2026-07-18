@@ -28,18 +28,20 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.treemiddle.photoexplorer.R
-import com.treemiddle.photoexplorer.common.designsystem.AuthorInfo
-import com.treemiddle.photoexplorer.common.designsystem.Exif
-import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
-import com.treemiddle.photoexplorer.common.designsystem.FullScreenView
-import com.treemiddle.photoexplorer.common.designsystem.LikeButton
-import com.treemiddle.photoexplorer.common.designsystem.LocalImage
-import com.treemiddle.photoexplorer.common.designsystem.Location
-import com.treemiddle.photoexplorer.common.designsystem.RemoteImage
-import com.treemiddle.photoexplorer.common.designsystem.Stats
-import com.treemiddle.photoexplorer.common.designsystem.TagList
-import com.treemiddle.photoexplorer.common.designsystem.TopBar
-import com.treemiddle.photoexplorer.core.extension.rememberSingleClick
+import com.treemiddle.photoexplorer.core.designsystem.AuthorInfo
+import com.treemiddle.photoexplorer.core.common.formatCount
+import com.treemiddle.photoexplorer.core.designsystem.Exif
+import com.treemiddle.photoexplorer.core.ui.toExifInfo
+import com.treemiddle.photoexplorer.core.designsystem.FullScreenLoading
+import com.treemiddle.photoexplorer.core.designsystem.FullScreenView
+import com.treemiddle.photoexplorer.core.designsystem.LikeButton
+import com.treemiddle.photoexplorer.core.designsystem.LocalImage
+import com.treemiddle.photoexplorer.core.designsystem.Location
+import com.treemiddle.photoexplorer.core.designsystem.RemoteImage
+import com.treemiddle.photoexplorer.core.designsystem.Stats
+import com.treemiddle.photoexplorer.core.designsystem.TagList
+import com.treemiddle.photoexplorer.core.designsystem.TopBar
+import com.treemiddle.photoexplorer.core.compose.rememberSingleClick
 import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
 import com.treemiddle.photoexplorer.domain.model.PhotoDetail
 import kotlinx.coroutines.flow.Flow
@@ -298,15 +300,15 @@ private fun LazyListScope.makeBody(photoDetail: PhotoDetail) {
     item {
         HorizontalDivider(modifier = modifier)
         Stats(
-            views = photoDetail.displayViews,
-            downloads = photoDetail.displayDownloads,
-            likes = photoDetail.displayLikes,
+            views = photoDetail.views.formatCount(),
+            downloads = photoDetail.downloads.formatCount(),
+            likes = photoDetail.likes.formatCount(),
             modifier = modifier
         )
         if (photoDetail.exif.isNotEmpty) {
             HorizontalDivider(modifier = modifier)
             Exif(
-                data = photoDetail.exif,
+                data = photoDetail.exif.toExifInfo(),
                 modifier = modifier
             )
         }

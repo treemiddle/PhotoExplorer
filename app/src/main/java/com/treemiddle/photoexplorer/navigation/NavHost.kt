@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.treemiddle.photoexplorer.feature.likedphotolist.LikedPhotoListScreen
+import com.treemiddle.photoexplorer.feature.photodetail.PHOTO_ID_ARG
 import com.treemiddle.photoexplorer.feature.photodetail.PhotoDetailScreen
 import com.treemiddle.photoexplorer.feature.photolist.PhotoListScreen
 
@@ -29,7 +30,7 @@ fun NavHost(controller: NavHostController = rememberNavController()) {
         }
         composable(
             route = Route.DETAIL,
-            arguments = listOf(navArgument(name = Route.PHOTO_ID) {
+            arguments = listOf(navArgument(name = PHOTO_ID_ARG) {
                 type = NavType.StringType
             })
         ) {

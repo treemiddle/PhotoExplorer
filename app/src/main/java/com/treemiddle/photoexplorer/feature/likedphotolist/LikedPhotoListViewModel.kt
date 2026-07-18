@@ -1,10 +1,10 @@
 package com.treemiddle.photoexplorer.feature.likedphotolist
 
 import androidx.lifecycle.viewModelScope
-import com.treemiddle.photoexplorer.base.BaseViewModel
+import com.treemiddle.photoexplorer.core.ui.BaseViewModel
 import com.treemiddle.photoexplorer.domain.repository.LayoutRepository
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
-import com.treemiddle.photoexplorer.feature.common.UserMessage
+import com.treemiddle.photoexplorer.core.ui.UserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

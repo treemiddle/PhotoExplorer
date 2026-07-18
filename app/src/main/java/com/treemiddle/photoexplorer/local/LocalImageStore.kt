@@ -3,7 +3,7 @@ package com.treemiddle.photoexplorer.local
 import android.content.Context
 import android.system.ErrnoException
 import android.system.OsConstants
-import com.treemiddle.photoexplorer.core.exception.StorageException
+import com.treemiddle.photoexplorer.core.common.StorageException
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

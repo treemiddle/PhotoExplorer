@@ -19,15 +19,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.treemiddle.photoexplorer.R
-import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
-import com.treemiddle.photoexplorer.common.designsystem.FullScreenView
-import com.treemiddle.photoexplorer.common.designsystem.PhotoCard
-import com.treemiddle.photoexplorer.common.designsystem.TopBar
-import com.treemiddle.photoexplorer.core.extension.rememberSingleClick
-import com.treemiddle.photoexplorer.domain.model.Layout
+import com.treemiddle.photoexplorer.core.designsystem.FullScreenLoading
+import com.treemiddle.photoexplorer.core.designsystem.FullScreenView
+import com.treemiddle.photoexplorer.core.designsystem.PhotoCard
+import com.treemiddle.photoexplorer.core.designsystem.TopBar
+import com.treemiddle.photoexplorer.core.compose.rememberSingleClick
+import com.treemiddle.photoexplorer.core.model.PhotoLayout
+import com.treemiddle.photoexplorer.core.ui.toPhotoLayout
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
-import com.treemiddle.photoexplorer.feature.common.LayoutToggle
-import com.treemiddle.photoexplorer.feature.common.PhotoList
+import com.treemiddle.photoexplorer.core.designsystem.LayoutToggle
+import com.treemiddle.photoexplorer.core.designsystem.PhotoList
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -72,7 +73,7 @@ private fun Screen(
         isLoading = state.isLoading,
         isError = state.isError,
         photoList = state.photoList,
-        layout = state.layout,
+        layout = state.layout.toPhotoLayout(),
         onRetryClick = {
             onEventSent(PhotoListContract.Event.OnRetryClick)
         },
@@ -102,7 +103,7 @@ private fun Content(
     isLoading: Boolean,
     isError: Boolean,
     photoList: List<PhotoInfo>,
-    layout: Layout,
+    layout: PhotoLayout,
     onRetryClick: () -> Unit,
     onLoadMore: () -> Unit,
     onPhotoClick: (String) -> Unit,
@@ -174,7 +175,7 @@ private fun Content(
 @Composable
 private fun List(
     list: List<PhotoInfo>,
-    layout: Layout,
+    layout: PhotoLayout,
     modifier: Modifier = Modifier,
     onLoadMore: () -> Unit,
     onPhotoClick: (String) -> Unit,
@@ -222,7 +223,7 @@ private fun P1() {
         isLoading = true,
         isError = false,
         photoList = emptyList(),
-        layout = Layout.TWO_GRID,
+        layout = PhotoLayout.TWO_GRID,
         onRetryClick = {},
         onLoadMore = {},
         onPhotoClick = {},
@@ -257,7 +258,7 @@ private fun P2() {
                 authorProfileImageUrl = ""
             ),
         ),
-        layout = Layout.ONE_GRID,
+        layout = PhotoLayout.ONE_GRID,
         onRetryClick = {},
         onLoadMore = {},
         onPhotoClick = {},
@@ -277,7 +278,7 @@ private fun P3() {
         isLoading = false,
         isError = true,
         photoList = emptyList(),
-        layout = Layout.ONE_GRID,
+        layout = PhotoLayout.ONE_GRID,
         onRetryClick = {},
         onLoadMore = {},
         onPhotoClick = {},
@@ -297,7 +298,7 @@ private fun P4() {
         isLoading = false,
         isError = false,
         photoList = emptyList(),
-        layout = Layout.ONE_GRID,
+        layout = PhotoLayout.ONE_GRID,
         onRetryClick = {},
         onLoadMore = {},
         onPhotoClick = {},

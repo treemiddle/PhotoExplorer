@@ -1,7 +1,5 @@
 package com.treemiddle.photoexplorer.domain.model
 
-import com.treemiddle.photoexplorer.core.extension.formatCount
-
 data class PhotoDetail(
     val id: String = "",
     val description: String = "",
@@ -23,9 +21,6 @@ data class PhotoDetail(
     } else {
         1f
     }
-    val displayViews = views.formatCount()
-    val displayDownloads = downloads.formatCount()
-    val displayLikes = likes.formatCount()
 }
 
 data class Exif(
