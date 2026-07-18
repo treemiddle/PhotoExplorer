@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PhotoExplorer</string>
+    <string name="app_name">Photo Explorer</string>
     <string name="content_description_unlike">좋아요 해제</string>
     <string name="content_description_like">좋아요 선택</string>
     <string name="retry_text">다시 시도</string>
