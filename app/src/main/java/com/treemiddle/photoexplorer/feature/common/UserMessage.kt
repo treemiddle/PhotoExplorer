@@ -1,4 +1,4 @@
-package com.treemiddle.photoexplorer.feature.photolist.model
+package com.treemiddle.photoexplorer.feature.common
 
 import androidx.annotation.StringRes
 import com.treemiddle.photoexplorer.R

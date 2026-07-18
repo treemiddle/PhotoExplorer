@@ -6,7 +6,7 @@ import com.treemiddle.photoexplorer.base.ViewState
 import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
 import com.treemiddle.photoexplorer.domain.model.PhotoDetail
 import com.treemiddle.photoexplorer.domain.model.toLikedPhotoRequest
-import com.treemiddle.photoexplorer.feature.photolist.model.UserMessage
+import com.treemiddle.photoexplorer.feature.common.UserMessage
 
 sealed interface PhotoDetailContract {
     data class State(

@@ -7,7 +7,7 @@ import com.treemiddle.photoexplorer.domain.model.PhotoInfo
 import com.treemiddle.photoexplorer.domain.model.toLikedPhotoRequest
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
-import com.treemiddle.photoexplorer.feature.photolist.model.UserMessage
+import com.treemiddle.photoexplorer.feature.common.UserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

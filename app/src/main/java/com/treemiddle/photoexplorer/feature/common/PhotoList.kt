@@ -24,9 +24,9 @@ fun <T> PhotoList(
     onRetryLoadMore: () -> Unit = {},
     item: @Composable (T) -> Unit
 ) {
-    val lazyGirdState = rememberLazyGridState()
+    val lazyGridState = rememberLazyGridState()
 
-    lazyGirdState.LoadMoreEffect(
+    lazyGridState.LoadMoreEffect(
         itemCount = list.size,
         onLoadMore = onLoadMore
     )
@@ -34,7 +34,7 @@ fun <T> PhotoList(
     LazyVerticalGrid(
         columns = GridCells.Fixed(count = 2),
         modifier = modifier,
-        state = lazyGirdState,
+        state = lazyGridState,
         contentPadding = PaddingValues(all = 10.dp),
         verticalArrangement = Arrangement.spacedBy(space = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(space = 10.dp)

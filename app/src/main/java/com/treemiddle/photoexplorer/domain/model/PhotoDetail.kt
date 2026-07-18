@@ -36,10 +36,12 @@ data class Exif(
     val focalLength: String = "",
     val iso: Int = -1,
 ) {
-    val camera = listOfNotNull(
+    val camera = listOf(
         make,
         model
-    ).joinToString(separator = " ")
+    ).filter {
+        it.isNotBlank()
+    }.joinToString(separator = " ")
     val displayAperture = if (aperture.isBlank()) {
         ""
     } else {

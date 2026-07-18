@@ -31,11 +31,7 @@ data class Exif(
     @SerialName("focal_length")
     val focalLength: String = "",
     val iso: Int = -1
-) {
-    val isNotEmpty = make.isNotBlank() || model.isNotBlank() ||
-            exposureTime.isNotBlank() || aperture.isNotBlank() ||
-            focalLength.isNotBlank() || iso != -1
-}
+)
 
 @Serializable
 data class Location(

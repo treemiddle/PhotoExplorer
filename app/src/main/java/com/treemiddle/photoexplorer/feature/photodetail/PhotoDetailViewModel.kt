@@ -6,7 +6,7 @@ import com.treemiddle.photoexplorer.base.BaseViewModelV4
 import com.treemiddle.photoexplorer.core.exception.StorageException
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
-import com.treemiddle.photoexplorer.feature.photolist.model.UserMessage
+import com.treemiddle.photoexplorer.feature.common.UserMessage
 import com.treemiddle.photoexplorer.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
