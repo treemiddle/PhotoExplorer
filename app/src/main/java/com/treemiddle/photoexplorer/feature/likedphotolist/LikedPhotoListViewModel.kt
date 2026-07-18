@@ -6,6 +6,11 @@ import com.treemiddle.photoexplorer.domain.repository.LayoutRepository
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.feature.common.UserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -14,6 +19,7 @@ class LikedPhotoListViewModel @Inject constructor(
     private val likeRepository: LikeRepository,
     private val layoutRepository: LayoutRepository
 ) : BaseViewModel<LikedPhotoListContract.Event, LikedPhotoListContract.State, LikedPhotoListContract.Effect>() {
+    private val loadedLimit = MutableStateFlow(value = PAGE_SIZE)
     private var hasNextPage = false
 
     override fun setInitialState(): LikedPhotoListContract.State {
@@ -37,37 +43,40 @@ class LikedPhotoListViewModel @Inject constructor(
     }
 
     init {
-        getLikedPhotoList()
-        observeLikedIds()
+        observeLikedPhotoList()
         observeLayout()
     }
 
-    private fun getLikedPhotoList() {
-        setState {
-            copy(isLoading = true)
-        }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeLikedPhotoList() {
         viewModelScope.launch {
-            runCatching {
-                likeRepository.getLikedPhotoList(
-                    limit = PAGE_SIZE,
-                    offset = 0
-                )
-            }.onSuccess {
-                setState {
-                    copy(
-                        isLoading = false,
-                        photoList = it
-                    )
+            loadedLimit
+                .flatMapLatest { limit ->
+                    likeRepository.observeLikedPhotoList(limit = limit).map { photos ->
+                        limit to photos
+                    }
                 }
-                updateNextPage(size = it.size)
-            }.onFailure {
-                setState {
-                    copy(isLoading = false)
+                .catch {
+                    setState {
+                        copy(
+                            isLoading = false,
+                            isLoadingMore = false
+                        )
+                    }
+                    setEffect {
+                        LikedPhotoListContract.Effect.ShowMessage(message = UserMessage.LIKED_LIST_LOAD_FAILED)
+                    }
                 }
-                setEffect {
-                    LikedPhotoListContract.Effect.ShowMessage(message = UserMessage.LIKED_LIST_LOAD_FAILED)
+                .collect { (limit, photos) ->
+                    hasNextPage = photos.size == limit
+                    setState {
+                        copy(
+                            isLoading = false,
+                            isLoadingMore = false,
+                            photoList = photos
+                        )
+                    }
                 }
-            }
         }
     }
 
@@ -75,35 +84,11 @@ class LikedPhotoListViewModel @Inject constructor(
         if (hasNextPage.not() || viewState.value.isLoadingMore) {
             return
         }
+
         setState {
             copy(isLoadingMore = true)
         }
-        viewModelScope.launch {
-            runCatching {
-                likeRepository.getLikedPhotoList(
-                    limit = PAGE_SIZE,
-                    offset = viewState.value.photoList.size
-                )
-            }.onSuccess {
-                setState {
-                    copy(
-                        isLoadingMore = false,
-                        photoList = (photoList + it).distinctBy { photo ->
-                            photo.id
-                        }
-                    )
-                }
-                updateNextPage(size = it.size)
-            }.onFailure {
-                setState {
-                    copy(isLoadingMore = false)
-                }
-            }
-        }
-    }
-
-    private fun updateNextPage(size: Int) {
-        hasNextPage = size == PAGE_SIZE
+        loadedLimit.value += PAGE_SIZE
     }
 
     private fun unLikeClick(photoId: String) {
@@ -113,50 +98,6 @@ class LikedPhotoListViewModel @Inject constructor(
             }.onFailure {
                 setEffect {
                     LikedPhotoListContract.Effect.ShowMessage(message = UserMessage.UNLIKE_FAILED)
-                }
-            }
-        }
-    }
-
-    private fun observeLikedIds() {
-        viewModelScope.launch {
-            var previousIds: Set<String>? = null
-            likeRepository.likedIds.collect { ids ->
-                val prev = previousIds
-                previousIds = ids
-                if (prev == null) {
-                    return@collect
-                }
-                val current = viewState.value.photoList
-                val currentIds = current.map { it.id }.toSet()
-                val newestLikedAt = current.firstOrNull()?.likedAt ?: 0L
-
-                val hasAdded = (ids - prev).isNotEmpty()
-                val newPhotos = if (hasAdded) {
-                    runCatching {
-                        likeRepository.getLikedPhotoList(
-                            limit = PAGE_SIZE,
-                            offset = 0
-                        )
-                    }.getOrDefault(defaultValue = emptyList()).filter {
-                        it.id !in currentIds && it.likedAt > newestLikedAt
-                    }
-                } else {
-                    emptyList()
-                }
-                setState {
-                    copy(
-                        photoList = (newPhotos + photoList)
-                            .distinctBy {
-                                it.id
-                            }
-                            .filter {
-                                it.id in ids
-                            }
-                            .sortedByDescending {
-                                it.likedAt
-                            }
-                    )
                 }
             }
         }

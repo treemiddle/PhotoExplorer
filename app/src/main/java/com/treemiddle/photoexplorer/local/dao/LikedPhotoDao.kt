@@ -21,8 +21,8 @@ interface LikedPhotoDao {
     @Query("SELECT id FROM liked_photo_card")
     fun observeLikedIds(): Flow<List<String>>
 
-    @Query("SELECT * FROM liked_photo_card ORDER BY likedAt DESC LIMIT :limit OFFSET :offset")
-    suspend fun getPage(limit: Int, offset: Int): List<LikedPhotoCardEntity>
+    @Query("SELECT * FROM liked_photo_card ORDER BY likedAt DESC, id DESC LIMIT :limit")
+    fun observePage(limit: Int): Flow<List<LikedPhotoCardEntity>>
 
     @Query("SELECT * FROM liked_photo_card WHERE id = :id")
     suspend fun get(id: String): LikedPhotoCardEntity?

@@ -30,8 +30,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.treemiddle.photoexplorer.R
 import com.treemiddle.photoexplorer.common.designsystem.AuthorInfo
 import com.treemiddle.photoexplorer.common.designsystem.Exif
-import com.treemiddle.photoexplorer.common.designsystem.FullScreenError
 import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
+import com.treemiddle.photoexplorer.common.designsystem.FullScreenView
 import com.treemiddle.photoexplorer.common.designsystem.LikeButton
 import com.treemiddle.photoexplorer.common.designsystem.LocalImage
 import com.treemiddle.photoexplorer.common.designsystem.Location
@@ -133,7 +133,7 @@ private fun Content(
                 }
 
                 isError -> {
-                    FullScreenError(
+                    FullScreenView(
                         message = stringResource(R.string.full_screen_error_text),
                         onRetryButtonClick = onRetryClick
                     )

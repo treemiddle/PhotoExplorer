@@ -10,6 +10,7 @@ import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -26,6 +27,12 @@ class LikeRepositoryImpl @Inject constructor(
 
     override fun observeIsLiked(id: String): Flow<Boolean> = localDataSource.observeIsLiked(id = id)
 
+    override fun observeLikedPhotoList(limit: Int): Flow<List<LikedPhotoCard>> {
+        return localDataSource.observeLikedPhotoList(limit = limit).map {
+            it.toDomain()
+        }
+    }
+
     override suspend fun like(photo: LikedPhotoRequest) {
         mutexOf(id = photo.id).withLock {
             if (localDataSource.hasId(id = photo.id)) {
@@ -41,16 +48,6 @@ class LikeRepositoryImpl @Inject constructor(
                 localDataSource.deleteImage(id = photoId)
             }
         }
-    }
-
-    override suspend fun getLikedPhotoList(
-        limit: Int,
-        offset: Int
-    ): List<LikedPhotoCard> {
-        return localDataSource.getLikedPhotoList(
-            limit = limit,
-            offset = offset
-        ).toDomain()
     }
 
     override suspend fun getLikedPhoto(photoId: String): LikedPhotoCard? {

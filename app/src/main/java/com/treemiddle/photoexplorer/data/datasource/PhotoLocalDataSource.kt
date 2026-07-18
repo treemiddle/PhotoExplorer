@@ -7,6 +7,7 @@ interface PhotoLocalDataSource {
     val likedIds: Flow<Set<String>>
 
     fun observeIsLiked(id: String): Flow<Boolean>
+    fun observeLikedPhotoList(limit: Int): Flow<List<LikedPhotoData>>
 
     suspend fun addPhotoCard(photoCard: LikedPhotoData)
     suspend fun hasId(id: String): Boolean
@@ -15,9 +16,5 @@ interface PhotoLocalDataSource {
         byteArray: ByteArray
     ): String
     suspend fun deleteImage(id: String)
-    suspend fun getLikedPhotoList(
-        limit: Int,
-        offset: Int
-    ): List<LikedPhotoData>
     suspend fun getLikedPhoto(id: String): LikedPhotoData?
 }

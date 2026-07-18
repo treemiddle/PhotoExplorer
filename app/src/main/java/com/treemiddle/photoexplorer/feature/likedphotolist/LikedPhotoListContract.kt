@@ -9,7 +9,7 @@ import com.treemiddle.photoexplorer.feature.common.UserMessage
 
 sealed interface LikedPhotoListContract {
     data class State(
-        val isLoading: Boolean = false,
+        val isLoading: Boolean = true,
         val photoList: List<LikedPhotoCard> = emptyList(),
         val isLoadingMore: Boolean = false,
         val layout: Layout = Layout.TWO_GRID

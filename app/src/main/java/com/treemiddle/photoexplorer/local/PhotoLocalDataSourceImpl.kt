@@ -19,6 +19,12 @@ class PhotoLocalDataSourceImpl @Inject constructor(
 
     override fun observeIsLiked(id: String): Flow<Boolean> = likedPhotoDao.observeIsLiked(id = id)
 
+    override fun observeLikedPhotoList(limit: Int): Flow<List<LikedPhotoData>> {
+        return likedPhotoDao.observePage(limit = limit).map {
+            it.toData()
+        }
+    }
+
     override suspend fun addPhotoCard(photoCard: LikedPhotoData) {
         likedPhotoDao.add(photoCard.toLocal())
     }
@@ -40,16 +46,6 @@ class PhotoLocalDataSourceImpl @Inject constructor(
     override suspend fun deleteImage(id: String) {
         likedPhotoDao.delete(id = id)
         localImageStore.delete(id = id)
-    }
-
-    override suspend fun getLikedPhotoList(
-        limit: Int,
-        offset: Int
-    ): List<LikedPhotoData> {
-        return likedPhotoDao.getPage(
-            limit = limit,
-            offset = offset
-        ).toData()
     }
 
     override suspend fun getLikedPhoto(id: String): LikedPhotoData? {

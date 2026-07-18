@@ -19,8 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.treemiddle.photoexplorer.R
-import com.treemiddle.photoexplorer.common.designsystem.FullScreenError
 import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
+import com.treemiddle.photoexplorer.common.designsystem.FullScreenView
 import com.treemiddle.photoexplorer.common.designsystem.PhotoCard
 import com.treemiddle.photoexplorer.common.designsystem.TopBar
 import com.treemiddle.photoexplorer.core.extension.rememberSingleClick
@@ -144,14 +144,14 @@ private fun Content(
                 }
 
                 isError -> {
-                    FullScreenError(
+                    FullScreenView(
                         message = stringResource(id = R.string.full_screen_error_text),
                         onRetryButtonClick = onRetryClick
                     )
                 }
 
                 photoList.isEmpty() -> {
-                    FullScreenError(message = stringResource(id = R.string.full_screen_photo_list_empty_text))
+                    FullScreenView(message = stringResource(id = R.string.full_screen_photo_list_empty_text))
                 }
 
                 else -> {

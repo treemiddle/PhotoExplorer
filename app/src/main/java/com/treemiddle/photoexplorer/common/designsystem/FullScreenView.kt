@@ -19,7 +19,7 @@ import com.treemiddle.photoexplorer.R
 import com.treemiddle.photoexplorer.core.extension.rememberSingleClick
 
 @Composable
-fun FullScreenError(
+fun FullScreenView(
     message: String,
     modifier: Modifier = Modifier,
     onRetryButtonClick: (() -> Unit)? = null
@@ -53,7 +53,7 @@ fun FullScreenError(
     name = "텍스트만 노출된 전체 에러 화면"
 )
 private fun P1() {
-    FullScreenError(message = "표시할 사진이 없어요.")
+    FullScreenView(message = "표시할 사진이 없어요.")
 }
 
 @Composable
@@ -62,7 +62,7 @@ private fun P1() {
     name = "텍스트 + 버튼이 노출된 전체 에러 화면"
 )
 private fun P2() {
-    FullScreenError(
+    FullScreenView(
         message = "표시할 사진이 없어요.",
         onRetryButtonClick = {}
     )
