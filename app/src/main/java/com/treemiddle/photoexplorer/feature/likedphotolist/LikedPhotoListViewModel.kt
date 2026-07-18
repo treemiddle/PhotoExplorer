@@ -2,6 +2,7 @@ package com.treemiddle.photoexplorer.feature.likedphotolist
 
 import androidx.lifecycle.viewModelScope
 import com.treemiddle.photoexplorer.base.BaseViewModelV4
+import com.treemiddle.photoexplorer.domain.repository.LayoutRepository
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.feature.common.UserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,7 +11,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LikedPhotoListViewModel @Inject constructor(
-    private val likeRepository: LikeRepository
+    private val likeRepository: LikeRepository,
+    private val layoutRepository: LayoutRepository
 ) : BaseViewModelV4<LikedPhotoListContract.Event, LikedPhotoListContract.State, LikedPhotoListContract.Effect>() {
     private var hasNextPage = false
 
@@ -27,12 +29,17 @@ class LikedPhotoListViewModel @Inject constructor(
             is LikedPhotoListContract.Event.UnLikeClick -> {
                 unLikeClick(photoId = event.photoId)
             }
+
+            LikedPhotoListContract.Event.OnClickLayout -> {
+                onLayoutClick()
+            }
         }
     }
 
     init {
         getLikedPhotoList()
         observeLikedIds()
+        observeLayout()
     }
 
     private fun getLikedPhotoList() {
@@ -152,6 +159,22 @@ class LikedPhotoListViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun observeLayout() {
+        viewModelScope.launch {
+            layoutRepository.layout.collect { layout ->
+                setState {
+                    copy(layout = layout)
+                }
+            }
+        }
+    }
+
+    private fun onLayoutClick() {
+        viewModelScope.launch {
+            layoutRepository.update(layout = viewState.value.layout.toggle())
         }
     }
 

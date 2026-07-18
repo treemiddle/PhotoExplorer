@@ -104,6 +104,9 @@ class PhotoDetailViewModel @Inject constructor(
         val isLiked = viewState.value.isLiked
         val request = viewState.value.request
         if (isLiked.not() && request == null) {
+            setEffect {
+                PhotoDetailContract.Effect.ShowMessage(message = UserMessage.LIKE_FAILED)
+            }
             return
         }
 
@@ -123,9 +126,15 @@ class PhotoDetailViewModel @Inject constructor(
                     copy(isLiked = isLikedInDatabase)
                 }
                 val message = when {
-                    it is StorageException -> UserMessage.STORAGE_FULL
-                    isLiked -> UserMessage.UNLIKE_FAILED
-                    else -> UserMessage.LIKE_FAILED
+                    it is StorageException -> {
+                        UserMessage.STORAGE_FULL
+                    }
+                    isLiked -> {
+                        UserMessage.UNLIKE_FAILED
+                    }
+                    else -> {
+                        UserMessage.LIKE_FAILED
+                    }
                 }
                 setEffect {
                     PhotoDetailContract.Effect.ShowMessage(message = message)

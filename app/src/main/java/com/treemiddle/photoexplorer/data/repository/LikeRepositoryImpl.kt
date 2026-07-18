@@ -7,9 +7,11 @@ import com.treemiddle.photoexplorer.data.mapper.toDomain
 import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
 import com.treemiddle.photoexplorer.domain.model.LikedPhotoRequest
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
@@ -72,7 +74,9 @@ class LikeRepositoryImpl @Inject constructor(
                 )
             )
         } catch (t: Throwable) {
-            localDataSource.deleteImage(id = photo.id)
+            withContext(NonCancellable) {
+                localDataSource.deleteImage(id = photo.id)
+            }
             throw t
         }
     }

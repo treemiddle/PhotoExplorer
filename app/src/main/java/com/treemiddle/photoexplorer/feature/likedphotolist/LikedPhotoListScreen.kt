@@ -18,7 +18,9 @@ import com.treemiddle.photoexplorer.common.designsystem.FullScreenError
 import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
 import com.treemiddle.photoexplorer.common.designsystem.PhotoCard
 import com.treemiddle.photoexplorer.common.designsystem.TopBar
+import com.treemiddle.photoexplorer.domain.model.Layout
 import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
+import com.treemiddle.photoexplorer.feature.common.LayoutToggle
 import com.treemiddle.photoexplorer.feature.common.PhotoList
 import kotlinx.coroutines.flow.Flow
 import java.io.File
@@ -66,6 +68,7 @@ private fun Screen(
         isLoading = state.isLoading,
         photoList = state.photoList,
         isLoadingMore = state.isLoadingMore,
+        layout = state.layout,
         onBackButtonClick = onNavigateBack,
         onLoadMore = {
             onEventSent(LikedPhotoListContract.Event.LoadMore)
@@ -73,6 +76,9 @@ private fun Screen(
         onPhotoClick = onNavigateToDetail,
         onUnlikeClick = { photoId ->
             onEventSent(LikedPhotoListContract.Event.UnLikeClick(photoId = photoId))
+        },
+        onClickLayout = {
+            onEventSent(LikedPhotoListContract.Event.OnClickLayout)
         }
     )
 }
@@ -82,16 +88,24 @@ private fun Content(
     isLoading: Boolean,
     photoList: List<LikedPhotoCard>,
     isLoadingMore: Boolean,
+    layout: Layout,
     onBackButtonClick: () -> Unit,
     onLoadMore: () -> Unit,
     onPhotoClick: (String) -> Unit,
-    onUnlikeClick: (String) -> Unit
+    onUnlikeClick: (String) -> Unit,
+    onClickLayout: () -> Unit
 ) {
     Scaffold(
         topBar = {
             TopBar(
                 title = stringResource(id = R.string.liked_photo_list_topbar_title),
-                onBack = onBackButtonClick
+                onBack = onBackButtonClick,
+                actions = {
+                    LayoutToggle(
+                        layout = layout,
+                        onToggle = onClickLayout
+                    )
+                }
             )
         }
     ) { innerPadding ->
@@ -113,6 +127,7 @@ private fun Content(
                     List(
                         list = photoList,
                         isLoadingMore = isLoadingMore,
+                        layout = layout,
                         onLoadMore = onLoadMore,
                         onPhotoClick = onPhotoClick,
                         onUnlikeClick = onUnlikeClick
@@ -127,6 +142,7 @@ private fun Content(
 private fun List(
     list: List<LikedPhotoCard>,
     isLoadingMore: Boolean,
+    layout: Layout,
     onLoadMore: () -> Unit,
     onPhotoClick: (String) -> Unit,
     onUnlikeClick: (String) -> Unit,
@@ -137,6 +153,7 @@ private fun List(
         key = {
             it.id
         },
+        columns = layout.columns,
         onLoadMore = onLoadMore,
         modifier = modifier,
         isLoadingMore = isLoadingMore,
@@ -148,6 +165,7 @@ private fun List(
             authorName = item.authorName,
             authorProfileImageUrl = item.authorProfileImageUrl,
             isLiked = item.isLiked,
+            layout = layout,
             onClick = {
                 onPhotoClick(item.id)
             },
@@ -168,10 +186,12 @@ private fun P1() {
         isLoading = true,
         photoList = emptyList(),
         isLoadingMore = false,
+        layout = Layout.TWO_GRID,
         onBackButtonClick = {},
         onLoadMore = {},
         onPhotoClick = {},
-        onUnlikeClick = {}
+        onUnlikeClick = {},
+        onClickLayout = {}
     )
 }
 
@@ -185,10 +205,12 @@ private fun P2() {
         isLoading = false,
         photoList = emptyList(),
         isLoadingMore = false,
+        layout = Layout.ONE_GRID,
         onBackButtonClick = {},
         onLoadMore = {},
         onPhotoClick = {},
-        onUnlikeClick = {}
+        onUnlikeClick = {},
+        onClickLayout = {}
     )
 }
 
@@ -213,10 +235,12 @@ private fun P3() {
             ),
         ),
         isLoadingMore = false,
+        layout = Layout.TWO_GRID,
         onBackButtonClick = {},
         onLoadMore = {},
         onPhotoClick = {},
-        onUnlikeClick = {}
+        onUnlikeClick = {},
+        onClickLayout = {}
     )
 }
 
@@ -246,9 +270,11 @@ private fun P4() {
             ),
         ),
         isLoadingMore = true,
+        layout = Layout.TWO_GRID,
         onBackButtonClick = {},
         onLoadMore = {},
         onPhotoClick = {},
-        onUnlikeClick = {}
+        onUnlikeClick = {},
+        onClickLayout = {}
     )
 }

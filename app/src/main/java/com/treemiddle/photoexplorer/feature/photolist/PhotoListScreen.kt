@@ -24,7 +24,9 @@ import com.treemiddle.photoexplorer.common.designsystem.FullScreenLoading
 import com.treemiddle.photoexplorer.common.designsystem.PhotoCard
 import com.treemiddle.photoexplorer.common.designsystem.TopBar
 import com.treemiddle.photoexplorer.core.extension.rememberSingleClick
+import com.treemiddle.photoexplorer.domain.model.Layout
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
+import com.treemiddle.photoexplorer.feature.common.LayoutToggle
 import com.treemiddle.photoexplorer.feature.common.PhotoList
 import kotlinx.coroutines.flow.Flow
 
@@ -70,6 +72,7 @@ private fun Screen(
         isLoading = state.isLoading,
         isError = state.isError,
         photoList = state.photoList,
+        layout = state.layout,
         onRetryClick = {
             onEventSent(PhotoListContract.Event.OnRetryClick)
         },
@@ -80,6 +83,9 @@ private fun Screen(
             onEventSent(PhotoListContract.Event.OnPhotoLikeClick(photoId = photoId))
         },
         onLikeClick = onNavigateToLiked,
+        onClickLayout = {
+            onEventSent(PhotoListContract.Event.OnLayoutClick)
+        },
         onLoadMore = {
             onEventSent(PhotoListContract.Event.LoadMore)
         },
@@ -96,11 +102,13 @@ private fun Content(
     isLoading: Boolean,
     isError: Boolean,
     photoList: List<PhotoInfo>,
+    layout: Layout,
     onRetryClick: () -> Unit,
     onLoadMore: () -> Unit,
     onPhotoClick: (String) -> Unit,
     onPhotoLikeClick: (String) -> Unit,
     onLikeClick: () -> Unit,
+    onClickLayout: () -> Unit,
     isLoadingMore: Boolean = false,
     isLoadingMoreError: Boolean = false,
     onRetryLoadMore: () -> Unit = {}
@@ -110,6 +118,10 @@ private fun Content(
             TopBar(
                 title = stringResource(id = R.string.app_name),
                 actions = {
+                    LayoutToggle(
+                        layout = layout,
+                        onToggle = onClickLayout
+                    )
                     IconButton(onClick = rememberSingleClick(onClick = onLikeClick)) {
                         Icon(
                             imageVector = Icons.Filled.Favorite,
@@ -145,6 +157,7 @@ private fun Content(
                 else -> {
                     List(
                         list = photoList,
+                        layout = layout,
                         onLoadMore = onLoadMore,
                         onRetryLoadMore = onRetryLoadMore,
                         onPhotoClick = onPhotoClick,
@@ -161,6 +174,7 @@ private fun Content(
 @Composable
 private fun List(
     list: List<PhotoInfo>,
+    layout: Layout,
     modifier: Modifier = Modifier,
     onLoadMore: () -> Unit,
     onPhotoClick: (String) -> Unit,
@@ -174,6 +188,7 @@ private fun List(
         key = {
             it.id
         },
+        columns = layout.columns,
         onLoadMore = onLoadMore,
         modifier = modifier,
         isLoadingMore = isLoadingMore,
@@ -186,6 +201,7 @@ private fun List(
             authorName = item.authorName,
             authorProfileImageUrl = item.authorProfileImageUrl,
             isLiked = item.isLiked,
+            layout = layout,
             onClick = {
                 onPhotoClick(item.id)
             },
@@ -206,11 +222,13 @@ private fun P1() {
         isLoading = true,
         isError = false,
         photoList = emptyList(),
+        layout = Layout.TWO_GRID,
         onRetryClick = {},
         onLoadMore = {},
         onPhotoClick = {},
         onLikeClick = {},
-        onPhotoLikeClick = {}
+        onPhotoLikeClick = {},
+        onClickLayout = {}
     )
 }
 
@@ -239,11 +257,13 @@ private fun P2() {
                 authorProfileImageUrl = ""
             ),
         ),
+        layout = Layout.ONE_GRID,
         onRetryClick = {},
         onLoadMore = {},
         onPhotoClick = {},
         onLikeClick = {},
-        onPhotoLikeClick = {}
+        onPhotoLikeClick = {},
+        onClickLayout = {}
     )
 }
 
@@ -257,11 +277,13 @@ private fun P3() {
         isLoading = false,
         isError = true,
         photoList = emptyList(),
+        layout = Layout.ONE_GRID,
         onRetryClick = {},
         onLoadMore = {},
         onPhotoClick = {},
         onLikeClick = {},
-        onPhotoLikeClick = {}
+        onPhotoLikeClick = {},
+        onClickLayout = {}
     )
 }
 
@@ -275,10 +297,12 @@ private fun P4() {
         isLoading = false,
         isError = false,
         photoList = emptyList(),
+        layout = Layout.ONE_GRID,
         onRetryClick = {},
         onLoadMore = {},
         onPhotoClick = {},
         onLikeClick = {},
-        onPhotoLikeClick = {}
+        onPhotoLikeClick = {},
+        onClickLayout = {}
     )
 }

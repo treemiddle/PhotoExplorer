@@ -17,6 +17,7 @@ import com.treemiddle.photoexplorer.core.extension.LoadMoreEffect
 fun <T> PhotoList(
     list: List<T>,
     key: (T) -> Any,
+    columns: Int,
     onLoadMore: () -> Unit,
     modifier: Modifier = Modifier,
     isLoadingMore: Boolean = false,
@@ -32,7 +33,7 @@ fun <T> PhotoList(
     )
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(count = 2),
+        columns = GridCells.Fixed(count = columns),
         modifier = modifier,
         state = lazyGridState,
         contentPadding = PaddingValues(all = 10.dp),

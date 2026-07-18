@@ -27,4 +27,6 @@
     <string name="component_stats_likes">좋아요</string>
     <string name="detail_info_error_text">상세 정보를 불러오지 못했어요.</string>
     <string name="liked_photo_list_load_failed_text">좋아요한 사진을 불러오는데 실패했어요.</string>
+    <string name="layout_one_grid_description">한 칸으로 보기</string>
+    <string name="layout_two_grid_description">두 칸으로 보기</string>
 </resources>

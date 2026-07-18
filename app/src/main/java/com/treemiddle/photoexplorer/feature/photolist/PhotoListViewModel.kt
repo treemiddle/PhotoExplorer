@@ -5,6 +5,7 @@ import com.treemiddle.photoexplorer.base.BaseViewModelV4
 import com.treemiddle.photoexplorer.core.exception.StorageException
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
 import com.treemiddle.photoexplorer.domain.model.toLikedPhotoRequest
+import com.treemiddle.photoexplorer.domain.repository.LayoutRepository
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
 import com.treemiddle.photoexplorer.feature.common.UserMessage
@@ -15,12 +16,13 @@ import javax.inject.Inject
 @HiltViewModel
 class PhotoListViewModel @Inject constructor(
     private val photoRepository: PhotoRepository,
-    private val likedRepository: LikeRepository
+    private val likedRepository: LikeRepository,
+    private val layoutRepository: LayoutRepository
 ) : BaseViewModelV4<PhotoListContract.Event, PhotoListContract.State, PhotoListContract.Effect>() {
     private var hasNextPage = false
     private var page = 1
 
-    private val likeProcessingIds = mutableSetOf<String>()
+    private val inFlightLikeRequestCounts = mutableMapOf<String, Int>()
     private var likedIds: Set<String> = emptySet()
 
     override fun setInitialState(): PhotoListContract.State {
@@ -44,12 +46,17 @@ class PhotoListViewModel @Inject constructor(
             is PhotoListContract.Event.OnPhotoLikeClick -> {
                 onPhotoLikeClick(event.photoId)
             }
+
+            PhotoListContract.Event.OnLayoutClick -> {
+                onLayoutClick()
+            }
         }
     }
 
     init {
         getPhotoList()
         observeLikedIds()
+        observeLayout()
     }
 
     private fun getPhotoList() {
@@ -133,30 +140,23 @@ class PhotoListViewModel @Inject constructor(
     }
 
     private fun onPhotoLikeClick(photoId: String) {
-        if (photoId in likeProcessingIds) {
-            return
-        }
         val photoCard = viewState.value.photoList.find {
             it.id == photoId
         } ?: return
 
-        likeProcessingIds += photoId
+        inFlightLikeRequestCounts[photoId] = (inFlightLikeRequestCounts[photoId] ?: 0) + 1
         updateLiked(
             photoId = photoCard.id,
             isLiked = photoCard.isLiked.not()
         )
         viewModelScope.launch {
-            runCatching {
+            val result = runCatching {
                 if (photoCard.isLiked) {
                     likedRepository.unlike(photoId = photoCard.id)
                 } else {
                     likedRepository.like(photo = photoCard.toLikedPhotoRequest())
                 }
             }.onFailure {
-                updateLiked(
-                    photoId = photoId,
-                    isLiked = photoId in likedIds
-                )
                 val message = when {
                     it is StorageException -> {
                         UserMessage.STORAGE_FULL
@@ -174,7 +174,28 @@ class PhotoListViewModel @Inject constructor(
                     PhotoListContract.Effect.ShowMessage(message = message)
                 }
             }
-            likeProcessingIds -= photoId
+            finishLikeWork(
+                photoId = photoId,
+                isFailed = result.isFailure
+            )
+        }
+    }
+
+    private fun finishLikeWork(
+        photoId: String,
+        isFailed: Boolean
+    ) {
+        val remaining = (inFlightLikeRequestCounts[photoId] ?: 1) - 1
+        if (remaining > 0) {
+            inFlightLikeRequestCounts[photoId] = remaining
+            return
+        }
+        inFlightLikeRequestCounts.remove(photoId)
+        if (isFailed) {
+            updateLiked(
+                photoId = photoId,
+                isLiked = photoId in likedIds
+            )
         }
     }
 
@@ -202,7 +223,7 @@ class PhotoListViewModel @Inject constructor(
                 setState {
                     copy(
                         photoList = photoList.map { photo ->
-                            if (photo.id in likeProcessingIds) {
+                            if (photo.id in inFlightLikeRequestCounts) {
                                 photo
                             } else {
                                 photo.copy(isLiked = photo.id in ids)
@@ -214,9 +235,29 @@ class PhotoListViewModel @Inject constructor(
         }
     }
 
+    private fun observeLayout() {
+        viewModelScope.launch {
+            layoutRepository.layout.collect { layout ->
+                setState {
+                    copy(layout = layout)
+                }
+            }
+        }
+    }
+
+    private fun onLayoutClick() {
+        viewModelScope.launch {
+            layoutRepository.update(layout = viewState.value.layout.toggle())
+        }
+    }
+
     private fun List<PhotoInfo>.withLikeState(): List<PhotoInfo> {
         return map {
-            it.copy(isLiked = it.id in likedIds)
+            if (it.id in inFlightLikeRequestCounts) {
+                it
+            } else {
+                it.copy(isLiked = it.id in likedIds)
+            }
         }
     }
 }
