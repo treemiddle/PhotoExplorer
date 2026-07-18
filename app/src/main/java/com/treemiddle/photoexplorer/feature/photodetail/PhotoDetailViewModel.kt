@@ -20,7 +20,7 @@ class PhotoDetailViewModel @Inject constructor(
 ) : BaseViewModel<PhotoDetailContract.Event, PhotoDetailContract.State, PhotoDetailContract.Effect>() {
     private val photoId = savedStateHandle[Route.PHOTO_ID] ?: ""
 
-    private var likeProcessing = false
+    private var pendingLikeRequestCount = 0
     private var isLikedInDatabase = false
 
     override fun setInitialState(): PhotoDetailContract.State {
@@ -98,40 +98,36 @@ class PhotoDetailViewModel @Inject constructor(
     }
 
     private fun onPhotoLikeClick() {
-        if (likeProcessing) {
+        if (viewState.value.isError) {
             return
         }
         val isLiked = viewState.value.isLiked
         val request = viewState.value.request
         if (isLiked.not() && request == null) {
-            setEffect {
-                PhotoDetailContract.Effect.ShowMessage(message = UserMessage.LIKE_FAILED)
-            }
             return
         }
 
-        likeProcessing = true
+        pendingLikeRequestCount++
         setState {
             copy(isLiked = isLiked.not())
         }
         viewModelScope.launch {
-            runCatching {
+            val result = runCatching {
                 if (isLiked) {
                     likedRepository.unlike(photoId = photoId)
                 } else if (request != null) {
                     likedRepository.like(photo = request)
                 }
             }.onFailure {
-                setState {
-                    copy(isLiked = isLikedInDatabase)
-                }
                 val message = when {
                     it is StorageException -> {
                         UserMessage.STORAGE_FULL
                     }
+
                     isLiked -> {
                         UserMessage.UNLIKE_FAILED
                     }
+
                     else -> {
                         UserMessage.LIKE_FAILED
                     }
@@ -140,7 +136,19 @@ class PhotoDetailViewModel @Inject constructor(
                     PhotoDetailContract.Effect.ShowMessage(message = message)
                 }
             }
-            likeProcessing = false
+            completeLikeRequest(isFailed = result.isFailure)
+        }
+    }
+
+    private fun completeLikeRequest(isFailed: Boolean) {
+        pendingLikeRequestCount--
+        if (pendingLikeRequestCount > 0) {
+            return
+        }
+        if (isFailed) {
+            setState {
+                copy(isLiked = isLikedInDatabase)
+            }
         }
     }
 
@@ -148,7 +156,7 @@ class PhotoDetailViewModel @Inject constructor(
         viewModelScope.launch {
             likedRepository.observeIsLiked(id = photoId).collect { isLiked ->
                 isLikedInDatabase = isLiked
-                if (likeProcessing.not()) {
+                if (pendingLikeRequestCount == 0) {
                     setState {
                         copy(isLiked = isLiked)
                     }

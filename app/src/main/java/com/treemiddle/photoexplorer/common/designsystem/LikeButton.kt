@@ -37,9 +37,9 @@ fun LikeButton(
                 Icons.Filled.FavoriteBorder
             },
             contentDescription = if (isLiked) {
-                stringResource(id = R.string.content_description_like)
-            } else {
                 stringResource(id = R.string.content_description_unlike)
+            } else {
+                stringResource(id = R.string.content_description_like)
             },
             modifier = if (withScrim) {
                 Modifier

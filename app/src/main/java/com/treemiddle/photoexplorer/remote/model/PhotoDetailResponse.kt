@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class PhotoDetailResponse(
+data class PhotoDetailResponse(
     val id: String = "",
     val description: String = "",
     @SerialName("alt_description")

@@ -79,9 +79,7 @@ data class Location(
         country
     ).filter {
         it.isNotBlank()
-    }.joinToString(separator = ", ").ifEmpty {
-        ""
-    }
+    }.joinToString(separator = ", ")
 }
 
 fun PhotoDetail.toLikedPhotoRequest(): LikedPhotoRequest {
