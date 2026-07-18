@@ -2,6 +2,7 @@ package com.treemiddle.photoexplorer.feature.photolist
 
 import androidx.lifecycle.viewModelScope
 import com.treemiddle.photoexplorer.core.ui.BaseViewModel
+import com.treemiddle.photoexplorer.core.common.RateLimitException
 import com.treemiddle.photoexplorer.core.common.StorageException
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
 import com.treemiddle.photoexplorer.domain.model.toLikedPhotoRequest
@@ -9,6 +10,7 @@ import com.treemiddle.photoexplorer.domain.repository.LayoutRepository
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
 import com.treemiddle.photoexplorer.core.ui.UserMessage
+import com.treemiddle.photoexplorer.core.ui.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -84,7 +86,8 @@ class PhotoListViewModel @Inject constructor(
                 setState {
                     copy(
                         isLoading = false,
-                        isError = true
+                        isError = true,
+                        errorMessage = it.toUserMessage(message = UserMessage.LOAD_FAILED)
                     )
                 }
             }
@@ -117,6 +120,11 @@ class PhotoListViewModel @Inject constructor(
                 }
                 updatePaging(hasNext = it.hasNext)
             }.onFailure {
+                if (it is RateLimitException) {
+                    setEffect {
+                        PhotoListContract.Effect.ShowMessage(message = UserMessage.RATE_LIMIT)
+                    }
+                }
                 setState {
                     copy(
                         isLoadingMore = false,

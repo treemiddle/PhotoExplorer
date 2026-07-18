@@ -7,6 +7,7 @@ import com.treemiddle.photoexplorer.core.common.StorageException
 import com.treemiddle.photoexplorer.domain.repository.LikeRepository
 import com.treemiddle.photoexplorer.domain.repository.PhotoRepository
 import com.treemiddle.photoexplorer.core.ui.UserMessage
+import com.treemiddle.photoexplorer.core.ui.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -86,10 +87,14 @@ class PhotoDetailViewModel @Inject constructor(
                     if (localPhoto == null) {
                         copy(
                             isLoading = false,
-                            isError = true
+                            isError = true,
+                            errorMessage = it.toUserMessage(message = UserMessage.LOAD_FAILED)
                         )
                     } else {
-                        copy(isDetailError = true)
+                        copy(
+                            isDetailError = true,
+                            errorMessage = it.toUserMessage(message = UserMessage.DETAIL_LOAD_FAILED)
+                        )
                     }
                 }
             }

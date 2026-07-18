@@ -1,5 +1,6 @@
 package com.treemiddle.photoexplorer.remote
 
+import com.treemiddle.photoexplorer.core.common.RateLimitException
 import com.treemiddle.photoexplorer.data.datasource.PhotoRemoteDataSource
 import com.treemiddle.photoexplorer.data.model.PhotoData
 import com.treemiddle.photoexplorer.data.model.PhotoDetailData
@@ -15,7 +16,7 @@ class PhotoExplorerRemoteDataSourceImpl @Inject constructor(
     override suspend fun getPhotoList(page: Int): PhotoData {
         val response = apiService.getPhotoList(page = page)
         if (response.isSuccessful.not()) {
-            throw HttpException(response)
+            throw HttpException(response).toException()
         }
 
         return PhotoResponse(
@@ -33,6 +34,22 @@ class PhotoExplorerRemoteDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getPhotoDetail(id: String): PhotoDetailData {
-        return apiService.getPhotoDetail(id = id).toData()
+        return try {
+            apiService.getPhotoDetail(id = id).toData()
+        } catch (e: HttpException) {
+            throw e.toException()
+        }
+    }
+
+    private fun HttpException.toException(): Exception {
+        return if (code() == RATE_LIMIT_CODE) {
+            RateLimitException(cause = this)
+        } else {
+            this
+        }
+    }
+
+    companion object {
+        private const val RATE_LIMIT_CODE = 403
     }
 }

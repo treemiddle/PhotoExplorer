@@ -25,6 +25,7 @@ import com.treemiddle.photoexplorer.core.designsystem.PhotoCard
 import com.treemiddle.photoexplorer.core.designsystem.TopBar
 import com.treemiddle.photoexplorer.core.compose.rememberSingleClick
 import com.treemiddle.photoexplorer.core.model.PhotoLayout
+import com.treemiddle.photoexplorer.core.ui.UserMessage
 import com.treemiddle.photoexplorer.core.ui.toPhotoLayout
 import com.treemiddle.photoexplorer.domain.model.PhotoInfo
 import com.treemiddle.photoexplorer.core.designsystem.LayoutToggle
@@ -72,6 +73,7 @@ private fun Screen(
     Content(
         isLoading = state.isLoading,
         isError = state.isError,
+        errorMessage = state.errorMessage,
         photoList = state.photoList,
         layout = state.layout.toPhotoLayout(),
         onRetryClick = {
@@ -110,6 +112,7 @@ private fun Content(
     onPhotoLikeClick: (String) -> Unit,
     onLikeClick: () -> Unit,
     onClickLayout: () -> Unit,
+    errorMessage: UserMessage = UserMessage.LOAD_FAILED,
     isLoadingMore: Boolean = false,
     isLoadingMoreError: Boolean = false,
     onRetryLoadMore: () -> Unit = {}
@@ -146,7 +149,7 @@ private fun Content(
 
                 isError -> {
                     FullScreenView(
-                        message = stringResource(id = R.string.full_screen_error_text),
+                        message = stringResource(id = errorMessage.value),
                         onRetryButtonClick = onRetryClick
                     )
                 }

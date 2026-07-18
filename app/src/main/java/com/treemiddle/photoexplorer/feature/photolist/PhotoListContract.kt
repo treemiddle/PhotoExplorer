@@ -11,6 +11,7 @@ sealed interface PhotoListContract {
     data class State(
         val isLoading: Boolean = false,
         val isError: Boolean = false,
+        val errorMessage: UserMessage = UserMessage.NONE,
         val photoList: List<PhotoInfo> = emptyList(),
         val isLoadingMore: Boolean = false,
         val isLoadingMoreError: Boolean = false,

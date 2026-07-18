@@ -15,6 +15,7 @@ sealed interface PhotoDetailContract {
         val isLoading: Boolean = false,
         val isError: Boolean = false,
         val isDetailError: Boolean = false,
+        val errorMessage: UserMessage = UserMessage.NONE,
         val isLiked: Boolean = false,
         val photoDetail: PhotoDetail? = null,
         val localPhoto: LikedPhotoCard? = null

@@ -31,6 +31,7 @@ import com.treemiddle.photoexplorer.R
 import com.treemiddle.photoexplorer.core.designsystem.AuthorInfo
 import com.treemiddle.photoexplorer.core.common.formatCount
 import com.treemiddle.photoexplorer.core.designsystem.Exif
+import com.treemiddle.photoexplorer.core.ui.UserMessage
 import com.treemiddle.photoexplorer.core.ui.toExifInfo
 import com.treemiddle.photoexplorer.core.designsystem.FullScreenLoading
 import com.treemiddle.photoexplorer.core.designsystem.FullScreenView
@@ -85,6 +86,7 @@ private fun Screen(
         isLoading = state.isLoading,
         isError = state.isError,
         isDetailError = state.isDetailError,
+        errorMessage = state.errorMessage,
         isLiked = state.isLiked,
         photoDetail = state.photoDetail,
         localPhoto = state.localPhoto,
@@ -103,6 +105,7 @@ private fun Content(
     isLoading: Boolean,
     isError: Boolean,
     isDetailError: Boolean,
+    errorMessage: UserMessage,
     isLiked: Boolean,
     photoDetail: PhotoDetail?,
     localPhoto: LikedPhotoCard?,
@@ -136,7 +139,7 @@ private fun Content(
 
                 isError -> {
                     FullScreenView(
-                        message = stringResource(R.string.full_screen_error_text),
+                        message = stringResource(id = errorMessage.value),
                         onRetryButtonClick = onRetryClick
                     )
                 }
@@ -150,6 +153,7 @@ private fun Content(
                             ?: localPhoto?.description).orEmpty(),
                         photoDetail = photoDetail,
                         isDetailError = isDetailError,
+                        errorMessage = errorMessage,
                         onRetryClick = onRetryClick,
                         image = {
                             when {
@@ -199,6 +203,7 @@ private fun List(
     description: String,
     photoDetail: PhotoDetail?,
     isDetailError: Boolean,
+    errorMessage: UserMessage,
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier,
     image: @Composable () -> Unit,
@@ -218,7 +223,10 @@ private fun List(
             }
 
             isDetailError -> {
-                makeDetailError(onRetryClick = onRetryClick)
+                makeDetailError(
+                    errorMessage = errorMessage,
+                    onRetryClick = onRetryClick
+                )
             }
 
             else -> {
@@ -256,7 +264,10 @@ private fun LazyListScope.makeHeader(
     }
 }
 
-private fun LazyListScope.makeDetailError(onRetryClick: () -> Unit) {
+private fun LazyListScope.makeDetailError(
+    errorMessage: UserMessage,
+    onRetryClick: () -> Unit
+) {
     item {
         Column(
             modifier = Modifier
@@ -266,7 +277,7 @@ private fun LazyListScope.makeDetailError(onRetryClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = stringResource(id = R.string.detail_info_error_text),
+                text = stringResource(id = errorMessage.value),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
