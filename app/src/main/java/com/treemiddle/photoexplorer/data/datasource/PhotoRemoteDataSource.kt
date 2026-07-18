@@ -3,7 +3,7 @@ package com.treemiddle.photoexplorer.data.datasource
 import com.treemiddle.photoexplorer.data.model.PhotoData
 import com.treemiddle.photoexplorer.data.model.PhotoDetailData
 
-interface PhotoExplorerRemoteDataSource {
+interface PhotoRemoteDataSource {
     suspend fun getPhotoList(page: Int): PhotoData
     suspend fun trackDownloadApi(id: String)
     suspend fun downloadImage(url: String): ByteArray

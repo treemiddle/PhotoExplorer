@@ -43,7 +43,7 @@ class PhotoLocalDataSourceImpl @Inject constructor(
         )
     }
 
-    override suspend fun deleteImage(id: String) {
+    override suspend fun deleteLikedPhoto(id: String) {
         likedPhotoDao.delete(id = id)
         localImageStore.delete(id = id)
     }

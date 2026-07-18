@@ -1,7 +1,7 @@
 package com.treemiddle.photoexplorer.remote.di
 
 import com.treemiddle.photoexplorer.BuildConfig
-import com.treemiddle.photoexplorer.data.datasource.PhotoExplorerRemoteDataSource
+import com.treemiddle.photoexplorer.data.datasource.PhotoRemoteDataSource
 import com.treemiddle.photoexplorer.remote.ImageDownloader
 import com.treemiddle.photoexplorer.remote.ImageDownloaderImpl
 import com.treemiddle.photoexplorer.remote.PhotoExplorerApiService
@@ -26,7 +26,7 @@ import javax.inject.Singleton
 internal interface NetworkModule {
     @Binds
     @Singleton
-    fun bindsPhotoRemoteDataSource(impl: PhotoExplorerRemoteDataSourceImpl): PhotoExplorerRemoteDataSource
+    fun bindsPhotoRemoteDataSource(impl: PhotoExplorerRemoteDataSourceImpl): PhotoRemoteDataSource
 
     @Binds
     @Singleton

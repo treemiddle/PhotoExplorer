@@ -34,7 +34,7 @@ fun LikedPhotoListScreen(
     Screen(
         state = viewModel.viewState.collectAsStateWithLifecycle().value,
         effectFlow = viewModel.effect,
-        onEventSent = viewModel::handleEvents,
+        onEventSent = viewModel::handleEvent,
         onNavigateBack = onNavigateBack,
         onNavigateToDetail = onNavigateToDetail
     )
@@ -43,7 +43,7 @@ fun LikedPhotoListScreen(
 @Composable
 private fun Screen(
     state: LikedPhotoListContract.State,
-    effectFlow: Flow<LikedPhotoListContract.Effect>?,
+    effectFlow: Flow<LikedPhotoListContract.Effect>,
     onEventSent: (event: LikedPhotoListContract.Event) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateToDetail: (String) -> Unit
@@ -51,7 +51,7 @@ private fun Screen(
     val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
-        effectFlow?.collect { effect ->
+        effectFlow.collect { effect ->
             when (effect) {
                 is LikedPhotoListContract.Effect.ShowMessage -> {
                     Toast.makeText(
@@ -78,7 +78,7 @@ private fun Screen(
             onEventSent(LikedPhotoListContract.Event.UnLikeClick(photoId = photoId))
         },
         onClickLayout = {
-            onEventSent(LikedPhotoListContract.Event.OnClickLayout)
+            onEventSent(LikedPhotoListContract.Event.OnLayoutClick)
         }
     )
 }

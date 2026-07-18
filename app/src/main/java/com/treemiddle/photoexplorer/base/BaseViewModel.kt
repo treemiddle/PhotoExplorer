@@ -25,7 +25,7 @@ abstract class BaseViewModel<Event : ViewEvent, UiState : ViewState, Effect : Vi
     private val _effect: Channel<Effect> = Channel()
 
     abstract fun setInitialState(): UiState
-    abstract fun handleEvents(event: Event)
+    abstract fun handleEvent(event: Event)
 
     protected fun setState(reducer: UiState.() -> UiState) {
         _viewState.update {

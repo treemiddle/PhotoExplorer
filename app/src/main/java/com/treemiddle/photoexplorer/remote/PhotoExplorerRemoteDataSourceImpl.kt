@@ -1,6 +1,6 @@
 package com.treemiddle.photoexplorer.remote
 
-import com.treemiddle.photoexplorer.data.datasource.PhotoExplorerRemoteDataSource
+import com.treemiddle.photoexplorer.data.datasource.PhotoRemoteDataSource
 import com.treemiddle.photoexplorer.data.model.PhotoData
 import com.treemiddle.photoexplorer.data.model.PhotoDetailData
 import com.treemiddle.photoexplorer.remote.mapper.toData
@@ -11,7 +11,7 @@ import javax.inject.Inject
 class PhotoExplorerRemoteDataSourceImpl @Inject constructor(
     private val apiService: PhotoExplorerApiService,
     private val imageDownloader: ImageDownloader
-) : PhotoExplorerRemoteDataSource {
+) : PhotoRemoteDataSource {
     override suspend fun getPhotoList(page: Int): PhotoData {
         val response = apiService.getPhotoList(page = page)
         if (response.isSuccessful.not()) {

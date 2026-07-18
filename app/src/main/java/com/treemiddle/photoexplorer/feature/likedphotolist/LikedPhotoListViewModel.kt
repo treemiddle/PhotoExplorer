@@ -26,7 +26,7 @@ class LikedPhotoListViewModel @Inject constructor(
         return LikedPhotoListContract.State()
     }
 
-    override fun handleEvents(event: LikedPhotoListContract.Event) {
+    override fun handleEvent(event: LikedPhotoListContract.Event) {
         when (event) {
             is LikedPhotoListContract.Event.LoadMore -> {
                 loadMore()
@@ -36,7 +36,7 @@ class LikedPhotoListViewModel @Inject constructor(
                 unLikeClick(photoId = event.photoId)
             }
 
-            LikedPhotoListContract.Event.OnClickLayout -> {
+            LikedPhotoListContract.Event.OnLayoutClick -> {
                 onLayoutClick()
             }
         }

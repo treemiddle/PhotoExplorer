@@ -1,7 +1,7 @@
 package com.treemiddle.photoexplorer.data.repository
 
-import com.treemiddle.photoexplorer.data.datasource.PhotoExplorerRemoteDataSource
 import com.treemiddle.photoexplorer.data.datasource.PhotoLocalDataSource
+import com.treemiddle.photoexplorer.data.datasource.PhotoRemoteDataSource
 import com.treemiddle.photoexplorer.data.mapper.toData
 import com.treemiddle.photoexplorer.data.mapper.toDomain
 import com.treemiddle.photoexplorer.domain.model.LikedPhotoCard
@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 class LikeRepositoryImpl @Inject constructor(
-    private val remoteDataSource: PhotoExplorerRemoteDataSource,
+    private val remoteDataSource: PhotoRemoteDataSource,
     private val localDataSource: PhotoLocalDataSource
 ) : LikeRepository {
     override val likedIds: Flow<Set<String>> = localDataSource.likedIds
@@ -45,7 +45,7 @@ class LikeRepositoryImpl @Inject constructor(
     override suspend fun unlike(photoId: String) {
         mutexOf(id = photoId).withLock {
             if (localDataSource.hasId(id = photoId)) {
-                localDataSource.deleteImage(id = photoId)
+                localDataSource.deleteLikedPhoto(id = photoId)
             }
         }
     }
@@ -77,7 +77,7 @@ class LikeRepositoryImpl @Inject constructor(
             )
         } catch (t: Throwable) {
             withContext(NonCancellable) {
-                localDataSource.deleteImage(id = photo.id)
+                localDataSource.deleteLikedPhoto(id = photo.id)
             }
             throw t
         }

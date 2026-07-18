@@ -18,7 +18,7 @@ sealed interface LikedPhotoListContract {
     sealed interface Event : ViewEvent {
         data object LoadMore : Event
         data class UnLikeClick(val photoId: String) : Event
-        data object OnClickLayout : Event
+        data object OnLayoutClick : Event
     }
 
     sealed interface Effect : ViewSideEffect {

@@ -16,7 +16,7 @@ import javax.inject.Inject
 class PhotoDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val photoRepository: PhotoRepository,
-    private val likedRepository: LikeRepository
+    private val likeRepository: LikeRepository
 ) : BaseViewModel<PhotoDetailContract.Event, PhotoDetailContract.State, PhotoDetailContract.Effect>() {
     private val photoId = savedStateHandle[Route.PHOTO_ID] ?: ""
 
@@ -27,7 +27,7 @@ class PhotoDetailViewModel @Inject constructor(
         return PhotoDetailContract.State()
     }
 
-    override fun handleEvents(event: PhotoDetailContract.Event) {
+    override fun handleEvent(event: PhotoDetailContract.Event) {
         when (event) {
             is PhotoDetailContract.Event.OnRetryClick -> {
                 getPhotoDetail()
@@ -50,7 +50,7 @@ class PhotoDetailViewModel @Inject constructor(
         }
         viewModelScope.launch {
             val localPhoto = runCatching {
-                likedRepository.getLikedPhoto(photoId = photoId)
+                likeRepository.getLikedPhoto(photoId = photoId)
             }.getOrNull()
             if (localPhoto != null) {
                 setState {
@@ -114,9 +114,9 @@ class PhotoDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val result = runCatching {
                 if (isLiked) {
-                    likedRepository.unlike(photoId = photoId)
+                    likeRepository.unlike(photoId = photoId)
                 } else if (request != null) {
-                    likedRepository.like(photo = request)
+                    likeRepository.like(photo = request)
                 }
             }.onFailure {
                 val message = when {
@@ -154,7 +154,7 @@ class PhotoDetailViewModel @Inject constructor(
 
     private fun observeIsLiked() {
         viewModelScope.launch {
-            likedRepository.observeIsLiked(id = photoId).collect { isLiked ->
+            likeRepository.observeIsLiked(id = photoId).collect { isLiked ->
                 isLikedInDatabase = isLiked
                 if (pendingLikeRequestCount == 0) {
                     setState {

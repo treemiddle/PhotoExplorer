@@ -15,6 +15,6 @@ interface PhotoLocalDataSource {
         photoId: String,
         byteArray: ByteArray
     ): String
-    suspend fun deleteImage(id: String)
+    suspend fun deleteLikedPhoto(id: String)
     suspend fun getLikedPhoto(id: String): LikedPhotoData?
 }

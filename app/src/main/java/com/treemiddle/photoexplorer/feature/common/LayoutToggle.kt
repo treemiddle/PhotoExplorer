@@ -60,7 +60,7 @@ private fun P1() {
     showBackground = true
 )
 @Composable
-private fun LayoutToggleOnePreview() {
+private fun P2() {
     LayoutToggle(
         Layout.ONE_GRID,
         onToggle = {}

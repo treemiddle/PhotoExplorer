@@ -52,7 +52,7 @@ fun PhotoDetailScreen(
     Screen(
         state = viewModel.viewState.collectAsStateWithLifecycle().value,
         effectFlow = viewModel.effect,
-        onEventSent = viewModel::handleEvents,
+        onEventSent = viewModel::handleEvent,
         onNavigateBack = onNavigateBack
     )
 }
@@ -60,14 +60,14 @@ fun PhotoDetailScreen(
 @Composable
 private fun Screen(
     state: PhotoDetailContract.State,
-    effectFlow: Flow<PhotoDetailContract.Effect>?,
+    effectFlow: Flow<PhotoDetailContract.Effect>,
     onEventSent: (event: PhotoDetailContract.Event) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
-        effectFlow?.collect { effect ->
+        effectFlow.collect { effect ->
             when (effect) {
                 is PhotoDetailContract.Effect.ShowMessage -> {
                     Toast.makeText(

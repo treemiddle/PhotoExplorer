@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PhotoListViewModel @Inject constructor(
     private val photoRepository: PhotoRepository,
-    private val likedRepository: LikeRepository,
+    private val likeRepository: LikeRepository,
     private val layoutRepository: LayoutRepository
 ) : BaseViewModel<PhotoListContract.Event, PhotoListContract.State, PhotoListContract.Effect>() {
     private var hasNextPage = false
@@ -29,7 +29,7 @@ class PhotoListViewModel @Inject constructor(
         return PhotoListContract.State()
     }
 
-    override fun handleEvents(event: PhotoListContract.Event) {
+    override fun handleEvent(event: PhotoListContract.Event) {
         when (event) {
             PhotoListContract.Event.OnRetryClick -> {
                 getPhotoList()
@@ -152,9 +152,9 @@ class PhotoListViewModel @Inject constructor(
         viewModelScope.launch {
             val result = runCatching {
                 if (photoCard.isLiked) {
-                    likedRepository.unlike(photoId = photoCard.id)
+                    likeRepository.unlike(photoId = photoCard.id)
                 } else {
-                    likedRepository.like(photo = photoCard.toLikedPhotoRequest())
+                    likeRepository.like(photo = photoCard.toLikedPhotoRequest())
                 }
             }.onFailure {
                 val message = when {
@@ -211,7 +211,7 @@ class PhotoListViewModel @Inject constructor(
 
     private fun observeLikedIds() {
         viewModelScope.launch {
-            likedRepository.likedIds.collect { ids ->
+            likeRepository.likedIds.collect { ids ->
                 databaseLikedIds = ids
                 updateLiked()
             }
